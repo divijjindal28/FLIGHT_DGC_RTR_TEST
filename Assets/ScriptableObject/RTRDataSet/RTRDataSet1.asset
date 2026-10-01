@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0efec3bccf2bfce419571df619947b1b, type: 3}
+  m_Name: RTRDataSet1
+  m_EditorClassIdentifier: Assembly-CSharp::RTRDataSet
+  testHeading: CANDIDATE PANEL - SPICEJET-933
+  maps:
+  - flightPhase: 0
+    map: {fileID: 21300000, guid: 72f3d4062e094724aa84e4d601864217, type: 3}
+    flightPhaseData: {fileID: 11400000, guid: fe18d1233525e3c41bde2f3850256928, type: 2}
+  - flightPhase: 1
+    map: {fileID: 21300000, guid: fe16fb400a210f0489fda19a1fb38528, type: 3}
+    flightPhaseData: {fileID: 11400000, guid: abb6bda58059fef4fb24bd4fcceef552, type: 2}
+  aircraftInformation: {fileID: 11400000, guid: d98ce27b639648844b02783eb299b445, type: 2}
+  baseFrequency: {fileID: 11400000, guid: 5a0711bda6357114ea08161a3d34fe8b, type: 2}
+  destinationFrequency: {fileID: 11400000, guid: c708ddf05fcfa4c40a56e33aa9ed07e5, type: 2}
+  metarInformation: {fileID: 11400000, guid: 8aa8d006fb729f6408b8c2beeb4db6fb, type: 2}

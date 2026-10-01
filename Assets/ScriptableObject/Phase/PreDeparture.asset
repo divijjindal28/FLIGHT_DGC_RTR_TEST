@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0536de97e7fd4614191b43ac07a26c83, type: 3}
+  m_Name: PreDeparture
+  m_EditorClassIdentifier: Assembly-CSharp::FlightPhaseData
+  flightPhase: 1
+  questions:
+  - {fileID: 11400000, guid: 78cdc170a79560240a4d227ecf20017a, type: 2}
+  - {fileID: 11400000, guid: ec4914650e7c22f48b8935fb46592fa4, type: 2}
+  - {fileID: 11400000, guid: eb60e59f7cf16154aa5cf17b81bdd9d2, type: 2}
+  - {fileID: 11400000, guid: 29689d77e7349de4882a225e2af2b0af, type: 2}
+  - {fileID: 11400000, guid: 3c890d690f3a71248be8aef98fd2e14f, type: 2}

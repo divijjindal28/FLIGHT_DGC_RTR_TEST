@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a18c9cd3b8a7f14eb8232344931a2a2, type: 3}
+  m_Name: AircraftInformationData1
+  m_EditorClassIdentifier: Assembly-CSharp::AircraftInformationData
+  callSign: SEJ933
+  type: A320
+  operatorName: SpiceJet
+  registration: VT-CCL
+  departure: VANP
+  destination: VILK
+  route: W139-KKJ-W40
+  level: FL-350
+  flightRules: IFR
+  squawk: 1324
+  otherInfo: 'POB: 57 Endurence 0300'
