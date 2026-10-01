@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RTRDataSet1
   m_EditorClassIdentifier: Assembly-CSharp::RTRDataSet
   testHeading: CANDIDATE PANEL - SPICEJET-933
-  maps:
+  phase:
   - flightPhase: 0
     map: {fileID: 21300000, guid: 72f3d4062e094724aa84e4d601864217, type: 3}
     flightPhaseData: {fileID: 11400000, guid: fe18d1233525e3c41bde2f3850256928, type: 2}

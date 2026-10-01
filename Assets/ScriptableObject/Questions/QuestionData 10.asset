@@ -16,3 +16,15 @@ MonoBehaviour:
     aircraft.
   description: Take appropriate action and request diversion to Bhopal.
   scenarioType: 8
+  answer: 'MAYDAY, MAYDAY, MAYDAY,
+
+
+    SEI933,
+
+
+    lightning strike, structural
+    damage,
+
+    [POSITION], FL350,
+
+    request immediate diversion to Bhopal.'

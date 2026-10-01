@@ -16,3 +16,7 @@ MonoBehaviour:
     at Flight Level 100.
   description: Take appropriate action.
   scenarioType: 4
+  answer: 'Approach, SEI933, traffic observed opposite direction,
+
+    FL100, passing
+    FL55.'

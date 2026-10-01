@@ -15,3 +15,6 @@ MonoBehaviour:
   question: While taxiing, you sight a Fire Tender crossing Taxiway A.
   description: Take appropriate action.
   scenarioType: 2
+  answer: 'Ground, SEI933, fire tender crossing Taxiway A,
+
+    holding position.'

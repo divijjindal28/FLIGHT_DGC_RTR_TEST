@@ -16,3 +16,6 @@ MonoBehaviour:
     path.
   description: Take appropriate action.
   scenarioType: 3
+  answer: 'Tower, SEI933, vehicle on the departure path,
+
+    holding position.'

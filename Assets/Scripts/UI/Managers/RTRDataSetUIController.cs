@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +7,10 @@ public class RTRDataSetUIController : MonoBehaviour
     [Header("RTR Data")]
     [SerializeField] private RTRDataSet rtrDataSet;
 
+    // Public access for other systems
+    public RTRDataSet DataSet => rtrDataSet;
+
+
     // =========================================================
     // TEST DEFINITION
     // =========================================================
@@ -14,10 +18,34 @@ public class RTRDataSetUIController : MonoBehaviour
     [Header("Test Definition")]
     [SerializeField] private TMP_Text testHeadingText;
 
-    [Header("Test Image")]
+
+    // =========================================================
+    // QUESTION PANEL
+    // =========================================================
+
+    [Header("Question Panel")]
+    [SerializeField] private GameObject questionPanel;
+
+    [SerializeField] private TMP_Text questionNumberText;
+    [SerializeField] private TMP_Text questionText;
+    [SerializeField] private TMP_Text questionDescriptionText;
+
+
+    // =========================================================
+    // TEST MAP
+    // =========================================================
+
+    [Header("Test Map")]
     [SerializeField] private Image testImage;
 
-    [SerializeField] private int imageIndex = 0;
+
+    // =========================================================
+    // ANSWER PANEL
+    // =========================================================
+
+    [Header("Answer Panel")]
+    [SerializeField] private GameObject answerPanel;
+    [SerializeField] private TMP_Text answerText;
 
 
     // =========================================================
@@ -25,7 +53,6 @@ public class RTRDataSetUIController : MonoBehaviour
     // =========================================================
 
     [Header("Aircraft Information")]
-
     [SerializeField] private TMP_Text callSignText;
     [SerializeField] private TMP_Text typeText;
     [SerializeField] private TMP_Text operatorText;
@@ -46,7 +73,6 @@ public class RTRDataSetUIController : MonoBehaviour
     // =========================================================
 
     [Header("Base Frequency")]
-
     [SerializeField] private TMP_Text baseSMCText;
     [SerializeField] private TMP_Text baseTowerText;
     [SerializeField] private TMP_Text baseApproachText;
@@ -59,7 +85,6 @@ public class RTRDataSetUIController : MonoBehaviour
     // =========================================================
 
     [Header("Destination Frequency")]
-
     [SerializeField] private TMP_Text destinationSMCText;
     [SerializeField] private TMP_Text destinationTowerText;
     [SerializeField] private TMP_Text destinationApproachText;
@@ -72,7 +97,6 @@ public class RTRDataSetUIController : MonoBehaviour
     // =========================================================
 
     [Header("METAR Information")]
-
     [SerializeField] private TMP_Text metarStationText;
     [SerializeField] private TMP_Text metarTimeText;
 
@@ -95,6 +119,9 @@ public class RTRDataSetUIController : MonoBehaviour
     private void Start()
     {
         PopulateUI();
+
+        // Start with question panel visible
+        ShowQuestion();
     }
 
 
@@ -131,43 +158,134 @@ public class RTRDataSetUIController : MonoBehaviour
 
     private void PopulateTestDefinition()
     {
-        // Test Heading
-        if (testHeadingText != null)
+        SetText(
+            testHeadingText,
+            rtrDataSet.testHeading
+        );
+    }
+
+
+    // =========================================================
+    // QUESTION DISPLAY
+    // =========================================================
+
+    public void DisplayQuestion(
+        PhaseElement phaseElement,
+        QuestionData question,
+        int questionNumber,
+        int totalQuestions
+    )
+    {
+        if (phaseElement == null)
         {
-            testHeadingText.text = rtrDataSet.testHeading;
+            Debug.LogError(
+                "RTRDataSetUIController: PhaseElement is null."
+            );
+
+            return;
+        }
+
+        if (question == null)
+        {
+            Debug.LogError(
+                "RTRDataSetUIController: QuestionData is null."
+            );
+
+            return;
         }
 
 
-        // Image
-        //if (testImage != null)
-        //{
-        //    if (rtrDataSet.images != null &&
-        //        rtrDataSet.images.Count > 0)
-        //    {
-        //        if (imageIndex >= 0 &&
-        //            imageIndex < rtrDataSet.images.Count)
-        //        {
-        //            testImage.sprite = rtrDataSet.images[imageIndex];
-        //            testImage.gameObject.SetActive(true);
-        //        }
-        //        else
-        //        {
-        //            Debug.LogWarning(
-        //                "RTRDataSetUIController: Image index is outside the RTRDataSet image list."
-        //            );
+        // -----------------------------------------------------
+        // MAP
+        // -----------------------------------------------------
 
-        //            testImage.gameObject.SetActive(false);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Debug.LogWarning(
-        //            "RTRDataSetUIController: RTRDataSet contains no images."
-        //        );
+        if (testImage != null)
+        {
+            testImage.sprite = phaseElement.map;
 
-        //        testImage.gameObject.SetActive(false);
-        //    }
-        //}
+            testImage.gameObject.SetActive(
+                phaseElement.map != null
+            );
+        }
+
+
+        // -----------------------------------------------------
+        // QUESTION NUMBER
+        // -----------------------------------------------------
+
+        SetText(
+            questionNumberText,
+            $"{questionNumber}"
+        );
+
+
+        // -----------------------------------------------------
+        // QUESTION
+        // -----------------------------------------------------
+
+        SetText(
+            questionText,
+            question.question
+        );
+
+
+        // -----------------------------------------------------
+        // DESCRIPTION / SUBTEXT
+        // -----------------------------------------------------
+
+        SetText(
+            questionDescriptionText,
+            question.description
+        );
+
+
+        // -----------------------------------------------------
+        // ANSWER
+        // -----------------------------------------------------
+
+        SetText(
+            answerText,
+            question.answer
+        );
+
+
+        // -----------------------------------------------------
+        // SHOW QUESTION
+        // -----------------------------------------------------
+
+        ShowQuestion();
+    }
+
+
+    // =========================================================
+    // SHOW ANSWER
+    // =========================================================
+
+    public void ShowAnswer()
+    {
+        // Hide question panel
+        if (questionPanel != null)
+            questionPanel.SetActive(false);
+
+        // Show answer panel
+        if (answerPanel != null)
+            answerPanel.SetActive(true);
+    }
+
+
+    // =========================================================
+    // SHOW QUESTION
+    // =========================================================
+
+    public void ShowQuestion()
+    {
+        // Show question panel
+        if (questionPanel != null)
+            questionPanel.SetActive(true);
+
+        // Hide answer panel
+        if (answerPanel != null)
+            answerPanel.SetActive(false);
     }
 
 
@@ -188,7 +306,6 @@ public class RTRDataSetUIController : MonoBehaviour
 
             return;
         }
-
 
         SetText(callSignText, data.callSign);
         SetText(typeText, data.type);
@@ -224,7 +341,6 @@ public class RTRDataSetUIController : MonoBehaviour
             return;
         }
 
-
         SetText(baseSMCText, data.smc.ToString("0.0"));
         SetText(baseTowerText, data.tower.ToString("0.00"));
         SetText(baseApproachText, data.approach.ToString("0.0"));
@@ -250,7 +366,6 @@ public class RTRDataSetUIController : MonoBehaviour
 
             return;
         }
-
 
         SetText(
             destinationSMCText,
@@ -297,7 +412,6 @@ public class RTRDataSetUIController : MonoBehaviour
             return;
         }
 
-
         SetText(metarStationText, data.station);
         SetText(metarTimeText, data.time);
 
@@ -330,7 +444,10 @@ public class RTRDataSetUIController : MonoBehaviour
     // HELPER
     // =========================================================
 
-    private void SetText(TMP_Text textField, string value)
+    private void SetText(
+        TMP_Text textField,
+        string value
+    )
     {
         if (textField == null)
             return;

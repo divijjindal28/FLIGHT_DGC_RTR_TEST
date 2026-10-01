@@ -34,4 +34,8 @@ public class QuestionData : ScriptableObject
     [Header("Scenario")]
     public ScenarioType scenarioType;
 
+    [Header("Answer")]
+    [TextArea(3, 8)]
+    public string answer;
+
 }

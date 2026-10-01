@@ -15,3 +15,11 @@ MonoBehaviour:
   question: Request ATC Clearance and Taxi Clearance.
   description: 
   scenarioType: 1
+  answer: 'Clearance Delivery, SEI933, request ATC clearance.
+
+
+    After receiving
+    the clearance:
+
+
+    Ground, SEI933, request taxi.'

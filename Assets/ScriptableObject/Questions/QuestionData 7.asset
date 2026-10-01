@@ -15,3 +15,10 @@ MonoBehaviour:
   question: Transmit a Relay Call for another aircraft.
   description: 
   scenarioType: 5
+  answer: 'Approach, SEI933, relay.
+
+
+    ABC123 reports position 20 miles north
+    of Bhopal,
+
+    maintaining FL250, estimating Bhopal at 1230 UTC.'

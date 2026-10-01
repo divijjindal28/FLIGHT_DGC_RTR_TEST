@@ -15,3 +15,8 @@ MonoBehaviour:
   question: Give Position Report.
   description: (Estimates were given.)
   scenarioType: 6
+  answer: 'SEI933, KKJ at 1230,
+
+    FL350, W139 next at 1245,
+
+    W40 following.'

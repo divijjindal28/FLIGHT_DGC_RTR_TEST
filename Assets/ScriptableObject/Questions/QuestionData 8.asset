@@ -15,3 +15,7 @@ MonoBehaviour:
   question: You experience severe turbulence and lose height by 2,000 feet.
   description: Take appropriate action and inform ATC.
   scenarioType: 7
+  answer: 'Approach, SEI933, severe turbulence,
+
+    unable to maintain level, lost
+    2,000 feet.'

@@ -23,7 +23,7 @@ public class RTRDataSet : ScriptableObject
     public string testHeading;
 
     [Header("Maps")]
-    public List<PhaseElement> maps;
+    public List<PhaseElement> phase;
 
     [Header("Aircraft Information")]
     public AircraftInformationData aircraftInformation;

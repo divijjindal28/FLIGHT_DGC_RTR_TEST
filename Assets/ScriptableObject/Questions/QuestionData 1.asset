@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestionData
   question: Request Pushback and Start-up.
   description: 
+  scenarioType: 0
+  answer: Ground, SEI933, request pushback and start-up.
