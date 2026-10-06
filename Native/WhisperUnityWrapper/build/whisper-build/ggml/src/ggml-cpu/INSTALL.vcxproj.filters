@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\divij\Documents\UnityProjects\Projects\FLIGHT_DGC_RTR_TEST\Native\WhisperUnityWrapper\build\CMakeFiles\06f2fabdb39abd3cfa3b459a1150b6bf\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{2BBEA5F9-70AB-3598-A010-2FBC969F4FF2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,16 @@
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/CMakeFiles/WhisperUnityWrapper.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/CMakeFiles/INSTALL.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/CMakeFiles/INSTALL.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/CMakeFiles/ALL_BUILD.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/CMakeFiles/INSTALL.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/CMakeFiles/ALL_BUILD.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/src/CMakeFiles/ggml-base.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/src/CMakeFiles/ggml.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/src/CMakeFiles/ggml-cpu.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/src/CMakeFiles/INSTALL.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/ggml/src/ggml-cpu/CMakeFiles/INSTALL.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/CMakeFiles/whisper.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/CMakeFiles/parakeet.dir
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/CMakeFiles/INSTALL.dir

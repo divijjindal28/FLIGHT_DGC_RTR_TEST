@@ -1,0 +1,2 @@
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/whisper.dir/MinSizeRel/whisper.obj
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/whisper.dir/MinSizeRel/whisper-aneforge.obj

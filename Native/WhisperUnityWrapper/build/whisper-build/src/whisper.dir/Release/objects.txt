@@ -1,0 +1,2 @@
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/whisper.dir/Release/whisper.obj
+C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/whisper.dir/Release/whisper-aneforge.obj

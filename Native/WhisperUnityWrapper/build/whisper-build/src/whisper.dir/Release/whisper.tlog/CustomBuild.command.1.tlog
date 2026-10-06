@@ -1,0 +1,10 @@
+^C:\USERS\DIVIJ\DOCUMENTS\UNITYPROJECTS\PROJECTS\FLIGHT_DGC_RTR_TEST\WHISPER.CPP\SRC\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper -BC:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build --check-stamp-file C:/Users/divij/Documents/UnityProjects/Projects/FLIGHT_DGC_RTR_TEST/Native/WhisperUnityWrapper/build/whisper-build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

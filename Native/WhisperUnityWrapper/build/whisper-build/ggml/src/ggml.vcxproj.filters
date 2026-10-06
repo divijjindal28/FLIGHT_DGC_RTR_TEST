@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\divij\Documents\UnityProjects\Projects\FLIGHT_DGC_RTR_TEST\whisper.cpp\ggml\src\ggml-backend-dl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\divij\Documents\UnityProjects\Projects\FLIGHT_DGC_RTR_TEST\whisper.cpp\ggml\src\ggml-backend-reg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\divij\Documents\UnityProjects\Projects\FLIGHT_DGC_RTR_TEST\whisper.cpp\ggml\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{CA8B1333-5DC9-3B80-A6FF-6D40BC301D5A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

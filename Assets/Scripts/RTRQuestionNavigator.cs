@@ -6,6 +6,30 @@ public class RTRQuestionNavigator : MonoBehaviour
     [Header("UI Controller")]
     [SerializeField] private RTRDataSetUIController uiController;
 
+    public QuestionData CurrentQuestion
+    {
+        get
+        {
+            if (DataSet == null)
+                return null;
+
+            if (currentPhaseIndex < 0 ||
+                currentPhaseIndex >= DataSet.phase.Count)
+                return null;
+
+            PhaseElement phase = DataSet.phase[currentPhaseIndex];
+
+            if (phase.flightPhaseData == null)
+                return null;
+
+            if (currentQuestionIndex < 0 ||
+                currentQuestionIndex >= phase.flightPhaseData.questions.Count)
+                return null;
+
+            return phase.flightPhaseData.questions[currentQuestionIndex];
+        }
+    }
+
     [Header("Navigation Buttons")]
     [SerializeField] private Button nextButton;
     [SerializeField] private Button previousButton;

@@ -15,6 +15,6 @@ MonoBehaviour:
   question: Request Departure.
   description: 
   scenarioType: 3
-  answer: 'Tower, SEI933, holding short Runway [RUNWAY],
+  answer: 'Tower, SEI933, holding short Runway 27,
 
     ready for departure.'
