@@ -23,6 +23,7 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
         public string[] data;
     }
 
+
     [Serializable]
     private class GradioEventResponse
     {
@@ -40,6 +41,11 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     [SerializeField] private TMP_InputField studentAnswerInput;
 
     [SerializeField] private Button sendButton;
+
+    [SerializeField] private RTRInteractionController interactionController;
+
+    [SerializeField]
+    private RTRLocalTTS localTTS;
 
 
     // --------------------------------------------------
@@ -82,7 +88,7 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
 
     private QuestionData currentQuestion;
 
-
+    private RTRInteractionData currentDisplayedInteraction;
     // --------------------------------------------------
     // Evaluator
     // --------------------------------------------------
@@ -149,6 +155,8 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     private void Update()
     {
         RefreshCurrentQuestion();
+        RefreshExpectedAnswerWhenInteractionChanges();
+
     }
 
 
@@ -172,27 +180,71 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
 
         currentQuestion = newQuestion;
 
+        currentDisplayedInteraction =
+            currentQuestion.requiresATCInteraction
+                ? questionNavigator.CurrentInteraction
+                : null;
 
-        // Put the correct answer into the input field
-        // whenever the question changes.
+        // Refresh the expected answer in the input field.
+        RefreshExpectedAnswerInput();
 
-        if (studentAnswerInput != null)
+        //// Clear previous result.
+        //if (reasonText != null)
+        //    reasonText.text = "";
+
+        //if (correctnessText != null)
+        //    correctnessText.text = "";
+    }
+
+    private void RefreshExpectedAnswerInput()
+    {
+        if (studentAnswerInput == null ||
+            currentQuestion == null)
+        {
+            return;
+        }
+
+        if (currentQuestion.requiresATCInteraction)
+        {
+            RTRInteractionData interaction =
+                questionNavigator != null
+                    ? questionNavigator.CurrentInteraction
+                    : null;
+
+            studentAnswerInput.text =
+                interaction != null
+                    ? interaction.expectedAnswer
+                    : string.Empty;
+        }
+        else
         {
             studentAnswerInput.text =
                 currentQuestion.answer;
-
-            studentAnswerInput.caretPosition =
-                studentAnswerInput.text.Length;
         }
 
+        studentAnswerInput.caretPosition =
+            studentAnswerInput.text.Length;
+    }
 
-        // Clear previous result.
 
-        if (reasonText != null)
-            reasonText.text = "";
+    private void RefreshExpectedAnswerWhenInteractionChanges()
+    {
+        if (questionNavigator == null ||
+            currentQuestion == null ||
+            !currentQuestion.requiresATCInteraction)
+        {
+            return;
+        }
 
-        if (correctnessText != null)
-            correctnessText.text = "";
+        RTRInteractionData interaction =
+            questionNavigator.CurrentInteraction;
+
+        if (interaction == currentDisplayedInteraction)
+            return;
+
+        currentDisplayedInteraction = interaction;
+
+        RefreshExpectedAnswerInput();
     }
 
 
@@ -246,8 +298,8 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
 
     private IEnumerator EvaluateCurrentAnswer()
     {
-        if (sendButton != null)
-            sendButton.interactable = false;
+        //if (sendButton != null)
+        //    sendButton.interactable = false;
 
 
         if (reasonText != null)
@@ -261,11 +313,37 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
         string studentAnswer =
             studentAnswerInput.text;
 
+        if (interactionController != null)
+        {
+            interactionController.ShowInteractionArea();
+
+            interactionController.ShowPilotInteraction(
+                studentAnswer
+            );
+        }
+
+        string expectedAnswer = GetExpectedAnswer();
+
+        if (string.IsNullOrWhiteSpace(expectedAnswer))
+        {
+            Debug.LogError(
+                "RTRAnswerEvaluatorTester: Expected answer is empty."
+            );
+
+            if (reasonText != null)
+                reasonText.text = "Expected answer is not configured.";
+
+            if (sendButton != null)
+                sendButton.interactable = true;
+
+            yield break;
+        }
 
         Task<RTRValidationResult> evaluationTask =
             answerEvaluator.Evaluate(
                 currentQuestion,
-                studentAnswer
+                studentAnswer,
+                expectedAnswer
             );
 
 
@@ -344,6 +422,23 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
         }
 
 
+        //if (interactionController != null)
+        //{
+        //    string atcResponse =
+        //        result.correctness
+        //            ? currentQuestion.correctATCResponse
+        //            : currentQuestion.incorrectATCResponse;
+
+        //    interactionController.ShowATCInteraction(
+        //        atcResponse
+        //    );
+
+        //    if (localTTS != null)
+        //    {
+        //        localTTS.Speak(atcResponse);
+        //    }
+        //}
+
         // --------------------------------------------------
         // Display Reason
         // --------------------------------------------------
@@ -352,6 +447,31 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
         {
             reasonText.text =
                 result.reason;
+        }
+
+
+        // --------------------------------------------------
+        // Move to Next Question
+        // --------------------------------------------------
+
+        if (!currentQuestion.requiresATCInteraction)
+        {
+            Debug.Log(
+                "RTRAnswerEvaluatorTester: " +
+                "Correct non-interaction question. " +
+                "Moving to next question."
+            );
+
+            if (questionNavigator != null)
+            {
+                questionNavigator.NextQuestion();
+            }
+            if(interactionController != null)
+            {
+                interactionController.HideInteractionArea();
+            }
+
+            yield break;
         }
 
 
@@ -371,9 +491,108 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
         );
 
 
+        // --------------------------------------------------
+        // INTERACTION ANSWER PROGRESSION
+        // --------------------------------------------------
+
+        if (result.correctness)
+        {
+            if (questionNavigator != null &&
+                questionNavigator.HasNextInteraction())
+            {
+                questionNavigator.NextInteraction();
+
+                // Update the expected answer for the new interaction.
+                RefreshExpectedAnswerInput();
+
+                // Clear the previous evaluation result.
+                //if (reasonText != null)
+                //    reasonText.text = "";
+
+                //if (correctnessText != null)
+                //    correctnessText.text = "";
+
+                if (sendButton != null)
+                    sendButton.interactable = true;
+
+                yield break;
+            }
+
+            // Correct answer on the final interaction.
+            if (questionNavigator != null)
+                questionNavigator.NextQuestion();
+
+            if (interactionController != null)
+                interactionController.HideInteractionArea();
+
+            yield break;
+        }
+
+        // Incorrect answer: stay on the current interaction.
+        RTRInteractionData interaction =
+            questionNavigator != null
+                ? questionNavigator.CurrentInteraction
+                : null;
+
+        if (interaction != null)
+        {
+            // Display the configured ATC response.
+            if (interactionController != null &&
+                !string.IsNullOrWhiteSpace(
+                    interaction.atcWrongAnswerResponse))
+            {
+                interactionController.ShowATCInteraction(
+                    interaction.atcWrongAnswerResponse
+                );
+
+                interactionController.PlayInteractionAudio(
+                   interaction.atcWrongAnswerAudio
+               );
+            }
+
+            Debug.Log(
+                "RTR: Incorrect answer. Staying on the current interaction."
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "RTR: Cannot display wrong-answer response because " +
+                "the current interaction is unavailable."
+            );
+        }
+
         if (sendButton != null)
             sendButton.interactable = true;
+
+        yield break;
     }
+
+
+
+    private string GetExpectedAnswer()
+    {
+        if (currentQuestion == null)
+            return string.Empty;
+
+        if (currentQuestion.requiresATCInteraction)
+        {
+            if (questionNavigator == null ||
+                questionNavigator.CurrentInteraction == null)
+            {
+                Debug.LogError(
+                    "RTRAnswerEvaluatorTester: Current interaction is not assigned."
+                );
+
+                return string.Empty;
+            }
+
+            return questionNavigator.CurrentInteraction.expectedAnswer;
+        }
+
+        return currentQuestion.answer;
+    }
+
 
 
     // ==================================================
@@ -401,7 +620,8 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
 
         public async Task<RTRValidationResult> Evaluate(
             QuestionData question,
-            string studentAnswer
+            string studentAnswer,
+            string expectedAnswer
         )
         {
             OnlineEvaluationRequest requestData =
@@ -414,7 +634,7 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                         question.description,
 
                     expected_answer =
-                        question.answer,
+                        expectedAnswer,
 
                     student_answer =
                         studentAnswer
@@ -610,6 +830,10 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                 return result;
             }
         }
+
+
+        
+
 
 
         private string ExtractResultJson(

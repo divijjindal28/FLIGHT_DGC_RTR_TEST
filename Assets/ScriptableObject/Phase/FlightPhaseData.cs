@@ -3,6 +3,7 @@ using UnityEngine;
 
 public enum FlightPhase
 {
+    General,
     PreDeparture,
     EnRoute,
     Arrival

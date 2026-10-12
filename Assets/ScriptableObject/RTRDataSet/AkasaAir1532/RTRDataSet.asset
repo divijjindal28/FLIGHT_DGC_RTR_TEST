@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0efec3bccf2bfce419571df619947b1b, type: 3}
+  m_Name: RTRDataSet
+  m_EditorClassIdentifier: Assembly-CSharp::RTRDataSet
+  testHeading: CANDIDATE PANEL- AkasaAir 1532
+  phase:
+  - flightPhase: 0
+    map: {fileID: 21300000, guid: 6ed7f45a4ab154a4fb73ce962aca6952, type: 3}
+    flightPhaseData: {fileID: 11400000, guid: 4f39a49317963fd4892b5da2bf288a4f, type: 2}
+  - flightPhase: 2
+    map: {fileID: 21300000, guid: 0ce9804de7b889749b5253586e385a9f, type: 3}
+    flightPhaseData: {fileID: 11400000, guid: 192ca7c8458289949bacf00eaa0af5cf, type: 2}
+  aircraftInformation: {fileID: 11400000, guid: d98ce27b639648844b02783eb299b445, type: 2}
+  baseFrequency: {fileID: 11400000, guid: 5a0711bda6357114ea08161a3d34fe8b, type: 2}
+  destinationFrequency: {fileID: 11400000, guid: c708ddf05fcfa4c40a56e33aa9ed07e5, type: 2}
+  metarInformation: {fileID: 11400000, guid: 8aa8d006fb729f6408b8c2beeb4db6fb, type: 2}

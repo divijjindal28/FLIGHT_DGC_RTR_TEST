@@ -1,5 +1,18 @@
 {
+
+  
+  "scopedRegistries": [
+    {
+      "name": "NPM",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "com.github.asus4"
+      ]
+    }
+  ],
   "dependencies": {
+    "com.github.asus4.onnxruntime": "0.4.9",
+    "com.github.asus4.onnxruntime.unity": "0.4.9",
     "com.unity.ai.navigation": "2.0.13",
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.ide.rider": "3.0.40",

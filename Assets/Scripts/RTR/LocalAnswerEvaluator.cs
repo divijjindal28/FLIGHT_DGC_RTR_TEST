@@ -10,8 +10,9 @@ public class LocalAnswerEvaluator : IAnswerEvaluator
         "http://127.0.0.1:5000/evaluate";
 
     public async Task<RTRValidationResult> Evaluate(
-        QuestionData question,
-        string studentAnswer)
+    QuestionData question,
+    string studentAnswer,
+    string expectedAnswer)
     {
         if (question == null)
         {
@@ -27,7 +28,7 @@ public class LocalAnswerEvaluator : IAnswerEvaluator
             {
                 question = question.question,
                 description = question.description,
-                expected_answer = question.answer,
+                expected_answer = expectedAnswer,
                 student_answer = studentAnswer
             };
 

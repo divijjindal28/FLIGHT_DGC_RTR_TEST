@@ -5,11 +5,24 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum WhisperModel
+{
+    BaseEnglish,
+    SmallEnglish
+}
+
 public class WhisperRealtimeRecorder : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private Button recordButton;
     [SerializeField] private TMP_Text transcriptText;
+    [SerializeField] private TMP_InputField transcriptInputField;
+    [SerializeField] private Button sendButton;
+
+    [Header("Whisper Model")]
+    [SerializeField]
+    private WhisperModel whisperModel =
+        WhisperModel.BaseEnglish;
 
     [Header("Recording")]
     [SerializeField] private int sampleRate = 16000;
@@ -49,25 +62,56 @@ public class WhisperRealtimeRecorder : MonoBehaviour
 
     private void LoadWhisper()
     {
+        string modelFileName;
+
+        switch (whisperModel)
+        {
+            case WhisperModel.BaseEnglish:
+                modelFileName = "ggml-base.en.bin";
+                break;
+
+            case WhisperModel.SmallEnglish:
+                modelFileName = "ggml-small.en.bin";
+                break;
+
+            default:
+                Debug.LogError(
+                    "WhisperRealtimeRecorder: " +
+                    "Unknown Whisper model selected."
+                );
+                return;
+        }
+
         string modelPath = Path.Combine(
             Application.streamingAssetsPath,
             "Whisper",
-            "ggml-base.en.bin"
+            modelFileName
         );
 
-        Debug.Log("Whisper model path:");
-        Debug.Log(modelPath);
+        Debug.Log(
+            "Selected Whisper model: " +
+            whisperModel
+        );
+
+        Debug.Log(
+            "Whisper model path:\n" +
+            modelPath
+        );
 
         if (!File.Exists(modelPath))
         {
             Debug.LogError(
-                "Whisper model not found: " + modelPath
+                "Whisper model not found:\n" +
+                modelPath
             );
 
             return;
         }
 
-        Debug.Log("Whisper model found.");
+        Debug.Log(
+            "Whisper model found:\n" +
+            modelFileName
+        );
 
         modelLoaded = WhisperNative.Whisper_LoadModel(
             modelPath
@@ -75,12 +119,18 @@ public class WhisperRealtimeRecorder : MonoBehaviour
 
         if (modelLoaded)
         {
-            Debug.Log("SUCCESS: Whisper model loaded.");
+            Debug.Log(
+                "SUCCESS: Whisper model loaded.\n" +
+                "Model: " +
+                whisperModel
+            );
         }
         else
         {
             Debug.LogError(
-                "FAILED: Whisper model could not be loaded."
+                "FAILED: Whisper model could not be loaded.\n" +
+                "Model: " +
+                whisperModel
             );
         }
     }
@@ -450,6 +500,17 @@ public class WhisperRealtimeRecorder : MonoBehaviour
         {
             transcriptText.text = result;
         }
+      
+
+        if (transcriptInputField != null)
+        {
+            transcriptInputField.text = result;
+        }
+
+        if (sendButton != null)
+        {
+            sendButton.onClick.Invoke();
+        }
     }
 
     // =========================================================
@@ -474,9 +535,11 @@ public class WhisperRealtimeRecorder : MonoBehaviour
         {
             float sum = 0f;
 
-            for (int channel = 0;
-                 channel < channels;
-                 channel++)
+            for (
+                int channel = 0;
+                channel < channels;
+                channel++
+            )
             {
                 sum += samples[
                     i * channels + channel

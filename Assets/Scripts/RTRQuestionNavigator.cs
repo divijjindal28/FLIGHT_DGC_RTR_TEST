@@ -30,13 +30,41 @@ public class RTRQuestionNavigator : MonoBehaviour
         }
     }
 
+    public RTRInteractionData CurrentInteraction
+    {
+        get
+        {
+            QuestionData question = CurrentQuestion;
+
+            if (question == null)
+                return null;
+
+            if (!question.requiresATCInteraction)
+                return null;
+
+            if (question.interactions == null ||
+                question.interactions.Count == 0)
+                return null;
+
+            if (currentInteractionIndex < 0 ||
+                currentInteractionIndex >= question.interactions.Count)
+                return null;
+
+            return question.interactions[currentInteractionIndex];
+        }
+    }
+
     [Header("Navigation Buttons")]
     [SerializeField] private Button nextButton;
     [SerializeField] private Button previousButton;
 
     private int currentPhaseIndex = 0;
     private int currentQuestionIndex = 0;
+    private int currentInteractionIndex = 0;
 
+
+    [Header("Interaction Controller")]
+    [SerializeField] private RTRInteractionController interactionController;
     private RTRDataSet DataSet
     {
         get
@@ -110,6 +138,7 @@ public class RTRQuestionNavigator : MonoBehaviour
 
         currentPhaseIndex = 0;
         currentQuestionIndex = 0;
+        currentInteractionIndex = 0;
 
         DisplayCurrentQuestion();
     }
@@ -155,6 +184,7 @@ public class RTRQuestionNavigator : MonoBehaviour
             currentPhaseData.questions.Count - 1)
         {
             currentQuestionIndex++;
+            currentInteractionIndex = 0;
 
             DisplayCurrentQuestion();
             return;
@@ -187,6 +217,7 @@ public class RTRQuestionNavigator : MonoBehaviour
         if (currentQuestionIndex > 0)
         {
             currentQuestionIndex--;
+            currentInteractionIndex = 0;
 
             DisplayCurrentQuestion();
             return;
@@ -213,6 +244,7 @@ public class RTRQuestionNavigator : MonoBehaviour
         {
             currentPhaseIndex++;
             currentQuestionIndex = 0;
+            currentInteractionIndex = 0;
 
             DisplayCurrentQuestion();
 
@@ -234,7 +266,7 @@ public class RTRQuestionNavigator : MonoBehaviour
         if (currentPhaseIndex > 0)
         {
             currentPhaseIndex--;
-
+            currentInteractionIndex = 0;
             PhaseElement previousPhaseElement =
                 DataSet.phase[currentPhaseIndex];
 
@@ -310,6 +342,8 @@ public class RTRQuestionNavigator : MonoBehaviour
             return;
         }
 
+        
+
         if (currentQuestionIndex < 0 ||
             currentQuestionIndex >= phaseData.questions.Count)
         {
@@ -331,6 +365,16 @@ public class RTRQuestionNavigator : MonoBehaviour
 
             return;
         }
+
+        // Reset interaction state for the new question.
+        ResetInteraction();
+
+        // Clear conversation history from the previous question.
+        if (interactionController != null)
+        {
+            interactionController.ClearInteractionArea();
+        }
+
 
 
         // -----------------------------------------------------
@@ -359,6 +403,8 @@ public class RTRQuestionNavigator : MonoBehaviour
             globalQuestionNumber,
             totalQuestionCount
         );
+
+        StartCurrentInteraction();
     }
 
 
@@ -447,6 +493,123 @@ public class RTRQuestionNavigator : MonoBehaviour
         }
 
         return true;
+    }
+
+
+    public bool HasNextInteraction()
+    {
+        QuestionData question = CurrentQuestion;
+
+        if (question == null)
+            return false;
+
+        if (!question.requiresATCInteraction)
+            return false;
+
+        if (question.interactions == null)
+            return false;
+
+        return currentInteractionIndex <
+            question.interactions.Count - 1;
+    }
+
+    public bool NextInteraction()
+    {
+        if (!HasNextInteraction())
+            return false;
+
+        currentInteractionIndex++;
+
+        Debug.Log(
+            "RTRQuestionNavigator: Moved to interaction " +
+            currentInteractionIndex
+        );
+
+        StartCurrentInteraction();
+
+        return true;
+    }
+
+    public void ResetInteraction()
+    {
+        currentInteractionIndex = 0;
+
+        Debug.Log(
+            "RTRQuestionNavigator: Interaction index reset to 0."
+        );
+    }
+
+    [ContextMenu("Test Interaction Navigation")]
+    private void TestInteractionNavigation()
+    {
+        // Always start the test from Interaction 1
+        ResetInteraction();
+
+        Debug.Log(
+            "CURRENT QUESTION: " +
+            (CurrentQuestion != null
+                ? CurrentQuestion.name
+                : "NULL")
+        );
+
+        Debug.Log(
+            "CURRENT INTERACTION: " +
+            (CurrentInteraction != null
+                ? CurrentInteraction.name
+                : "NULL")
+        );
+
+        Debug.Log(
+            "HAS NEXT INTERACTION: " +
+            HasNextInteraction()
+        );
+
+        bool moved = NextInteraction();
+
+        Debug.Log(
+            "NEXT INTERACTION RESULT: " +
+            moved
+        );
+
+        Debug.Log(
+            "CURRENT INTERACTION AFTER MOVE: " +
+            (CurrentInteraction != null
+                ? CurrentInteraction.name
+                : "NULL")
+        );
+    }
+
+
+
+    private void StartCurrentInteraction()
+    {
+        Debug.Log("[RTRQuestionNavigator] StartCurrentInteraction() called.");
+
+        if (CurrentInteraction == null)
+        {
+            Debug.LogWarning(
+                "[RTRQuestionNavigator] CurrentInteraction is NULL."
+            );
+            return;
+        }
+
+        // First interaction: don't display an ATC prompt.
+        if (currentInteractionIndex == 0)
+        {
+            Debug.Log(
+                "[RTRQuestionNavigator] First interaction: " +
+                "skipping ATC question and initial audio."
+            );
+            return;
+        }
+
+        interactionController.ShowATCInteraction(
+            CurrentInteraction.atcQuestion
+        );
+
+        interactionController.PlayInteractionAudio(
+            CurrentInteraction.atcAudio
+        );
     }
 
 

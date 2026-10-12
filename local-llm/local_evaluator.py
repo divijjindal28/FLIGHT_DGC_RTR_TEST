@@ -229,19 +229,13 @@ STUDENT ANSWER:
     # --------------------------------------------------
 
     payload = {
-        "messages": [
-            {
-                "role": "system",
-                "content": RTR_SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        "temperature": 0.1,
-        "max_tokens": 1000
-    }
+    "messages": [
+        {"role": "system", "content": RTR_SYSTEM_PROMPT},
+        {"role": "user", "content": prompt}
+    ],
+    "temperature": 0.1,
+    "max_tokens": 1000
+}
 
     try:
 

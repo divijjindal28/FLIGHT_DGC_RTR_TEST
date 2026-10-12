@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -38,4 +39,8 @@ public class QuestionData : ScriptableObject
     [TextArea(3, 8)]
     public string answer;
 
+    [Header("ATC Interaction")]
+    public bool requiresATCInteraction;
+
+    public List<RTRInteractionData> interactions;
 }
