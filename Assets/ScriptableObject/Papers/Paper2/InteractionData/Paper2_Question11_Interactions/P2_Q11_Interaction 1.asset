@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
+  m_Name: P2_Q11_Interaction 1
+  m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
+  atcQuestion: 
+  atcAudio: {fileID: 0}
+  expectedAnswer: MAYDAY,MAYDAY,MAYDAY, Nagpur Control, Victor Tango Kilo November
+    Tango, ATR Seven Two, switched off port engine due fire. Position Two Six DME
+    inbound Juliette Juliette Bravo VOR, passing Flight Level One Six Zero descending.
+    Request descend to Five Thousand feet and contact Jabalpur tower for emergency
+    landing. Squawking Seven Seven Zero Zero. Persons on board Four Seven. Fuel endurance
+    Two Hours.
+  atcWrongAnswerResponse: Victor Tango Kilo November Tango, Please say your request
+    again.
+  atcWrongAnswerAudio: {fileID: 8300000, guid: d1db9c5c0cd5c964ea389520c87d070b, type: 3}

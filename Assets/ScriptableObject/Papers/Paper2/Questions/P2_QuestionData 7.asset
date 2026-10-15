@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
+  m_Name: P2_QuestionData 7
+  m_EditorClassIdentifier: Assembly-CSharp::QuestionData
+  question: Taxi Request
+  description: 
+  scenarioType: 0
+  answer: 
+  requiresATCInteraction: 1
+  interactions:
+  - {fileID: 11400000, guid: c7f22278178fde34796a69d08f5afba5, type: 2}
+  - {fileID: 11400000, guid: 1289852c2afaf9a4899d0892b50b75e5, type: 2}

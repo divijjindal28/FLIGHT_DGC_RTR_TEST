@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0536de97e7fd4614191b43ac07a26c83, type: 3}
+  m_Name: P2_Phase 1
+  m_EditorClassIdentifier: Assembly-CSharp::FlightPhaseData
+  flightPhase: 1
+  questions:
+  - {fileID: 11400000, guid: 7e7baa5033c90b743b978d65784c0d5e, type: 2}
+  - {fileID: 11400000, guid: f2c66928df5293f47a35fefe1b649311, type: 2}
+  - {fileID: 11400000, guid: e12a82bf41070204e870f8bd1cafc460, type: 2}
+  - {fileID: 11400000, guid: 63a054e0d6733744a8fd5f56414e9ae2, type: 2}
+  - {fileID: 11400000, guid: cd02cd90795cbd947a6722fa1fada020, type: 2}
+  - {fileID: 11400000, guid: 6120a53023252624d908b14347ae2d33, type: 2}

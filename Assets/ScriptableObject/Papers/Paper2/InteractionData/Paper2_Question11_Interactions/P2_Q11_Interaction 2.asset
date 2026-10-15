@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
+  m_Name: P2_Q11_Interaction 2
+  m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
+  atcQuestion: Victor Tango Kilo November Tango, roger MAYDAY. Clear descend to Five
+    Thousand feet on QNH Nine Nine Eight. Contact Jabalpur tower on One One Eight
+    decimal Three.
+  atcAudio: {fileID: 8300000, guid: 628d1197d534f534f89b96b18ed9c939, type: 3}
+  expectedAnswer: Descend to Five Thousand feet, QNH Nine Nine Eight. Contact Jabalpur
+    Tower on One One Eight decimal Three. Victor Tango Kilo November Tango.
+  atcWrongAnswerResponse: Victor Tango Kilo November Tango, Please say your request
+    again.
+  atcWrongAnswerAudio: {fileID: 8300000, guid: d1db9c5c0cd5c964ea389520c87d070b, type: 3}
