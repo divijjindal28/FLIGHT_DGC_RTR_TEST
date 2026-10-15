@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
+  m_Name: P1_QuestionData 10
+  m_EditorClassIdentifier: Assembly-CSharp::QuestionData
+  question: You have departed Lucknow. Passing 2700 ft, cleared to level 18000 feet,
+    request higher level 20000 feet.
+  description: 
+  scenarioType: 0
+  answer: 
+  requiresATCInteraction: 1
+  interactions:
+  - {fileID: 11400000, guid: 61c4bd549c1b87b46b2c25d856324cb9, type: 2}
+  - {fileID: 11400000, guid: 3a374e29ec6ae544b9c026b337c8ff1a, type: 2}

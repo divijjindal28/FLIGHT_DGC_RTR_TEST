@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
+  m_Name: P1_QuestionData 8
+  m_EditorClassIdentifier: Assembly-CSharp::QuestionData
+  question: Taxiway obstructed by unserviceable ambulance.
+  description: 
+  scenarioType: 0
+  answer: 
+  requiresATCInteraction: 1
+  interactions:
+  - {fileID: 11400000, guid: 1c7244fb120833840b6f6b885ebf7fd7, type: 2}
+  - {fileID: 11400000, guid: bd1d748f57483ad4b92b0a329d74d83b, type: 2}
