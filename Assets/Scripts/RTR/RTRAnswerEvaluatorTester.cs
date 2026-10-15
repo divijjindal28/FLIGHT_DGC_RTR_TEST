@@ -8,11 +8,15 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 
+
 public enum EvaluationMode
 {
     Online,
-    Local
+    Local,
+    Algorithmic,
+    Gemini
 }
+
 
 
 public class RTRAnswerEvaluatorTester : MonoBehaviour
@@ -67,6 +71,17 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     private EvaluationMode evaluationMode =
         EvaluationMode.Online;
 
+    [Header("Gemini")]
+    [Tooltip("Used for local testing. Do not include this key in a build that you distribute.")]
+    [SerializeField]
+    private string geminiApiKey;
+
+    [SerializeField]
+    private string geminiModel = "gemini-3.8-flash";
+
+    [SerializeField, TextArea(10, 30)]
+    private string geminiParentPrompt;
+
 
     // --------------------------------------------------
     // Hugging Face
@@ -94,11 +109,19 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     // --------------------------------------------------
 
     private IAnswerEvaluator answerEvaluator;
+    [SerializeField]
+    private RTRQuestionStatusTracker questionStatusTracker;
 
 
+    [SerializeField] private RTRMistakeTracker mistakeTracker;
+
+    [SerializeField]
+    private RTRApiCostTracker apiCostTracker;
     // --------------------------------------------------
     // Start
     // --------------------------------------------------
+
+
 
     private void Start()
     {
@@ -124,7 +147,8 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                 answerEvaluator =
                     new OnlineAnswerEvaluator(
                         spaceUrl,
-                        hfToken
+                        hfToken,
+                        apiCostTracker
                     );
 
                 Debug.Log(
@@ -144,6 +168,30 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                 );
 
                 break;
+
+
+            case EvaluationMode.Algorithmic:
+
+                answerEvaluator = new AlgorithmicAnswerEvaluator();
+
+                Debug.Log(
+                    "RTRAnswerEvaluatorTester: " +
+                    "Evaluation Mode: ALGORITHMIC RAPIDFUZZ MATCHING"
+                );
+
+                break;
+
+            case EvaluationMode.Gemini:
+
+                answerEvaluator = new GeminiAnswerEvaluator(
+                    geminiApiKey,
+                    geminiModel,
+                    geminiParentPrompt);
+
+                Debug.Log("RTR Evaluator Mode: GEMINI REST API");
+
+                break;
+
         }
     }
 
@@ -449,6 +497,15 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                 result.reason;
         }
 
+        // Count incorrect answers for both normal questions and ATC interactions.
+        if (!result.correctness && mistakeTracker != null)
+        {
+            mistakeTracker.RegisterMistake();
+
+            // Stop processing if the exam has ended.
+            if (mistakeTracker.ExamEnded)
+                yield break;
+        }
 
         // --------------------------------------------------
         // Move to Next Question
@@ -456,6 +513,16 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
 
         if (!currentQuestion.requiresATCInteraction)
         {
+
+            if (questionStatusTracker != null &&
+             questionNavigator != null)
+            {
+                questionStatusTracker.SetQuestionResult(
+                    questionNavigator.GetGlobalQuestionNumber(),
+                    result.correctness
+                );
+            }
+
             Debug.Log(
                 "RTRAnswerEvaluatorTester: " +
                 "Correct non-interaction question. " +
@@ -466,7 +533,7 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
             {
                 questionNavigator.NextQuestion();
             }
-            if(interactionController != null)
+            if (interactionController != null)
             {
                 interactionController.HideInteractionArea();
             }
@@ -594,6 +661,64 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     }
 
 
+    private class AlgorithmicAnswerEvaluator : IAnswerEvaluator
+    {
+        private const string AlgorithmicEvaluatorUrl =
+            "http://127.0.0.1:5000/algorithmic_evaluate";
+
+        public async Task<RTRValidationResult> Evaluate(
+            QuestionData question,
+            string studentAnswer,
+            string expectedAnswer)
+        {
+            AlgorithmicEvaluationRequest requestData =
+                new AlgorithmicEvaluationRequest
+                {
+                    expected_answer = expectedAnswer,
+                    student_answer = studentAnswer
+                };
+
+            string requestJson =
+                JsonUtility.ToJson(requestData);
+
+            using (UnityWebRequest request = new UnityWebRequest(
+                AlgorithmicEvaluatorUrl,
+                UnityWebRequest.kHttpVerbPOST))
+            {
+                request.uploadHandler = new UploadHandlerRaw(
+                    Encoding.UTF8.GetBytes(requestJson));
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader(
+                    "Content-Type",
+                    "application/json");
+
+                UnityWebRequestAsyncOperation operation =
+                    request.SendWebRequest();
+
+                while (!operation.isDone)
+                    await Task.Yield();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    throw new Exception(
+                        "RapidFuzz evaluation failed: " + request.error +
+                        "\nResponse: " + request.downloadHandler.text);
+                }
+
+                RTRValidationResult result =
+                    JsonUtility.FromJson<RTRValidationResult>(
+                        request.downloadHandler.text);
+
+                if (result == null)
+                    throw new Exception(
+                        "RapidFuzz evaluator returned invalid JSON.");
+
+                return result;
+            }
+        }
+
+    }
+
 
     // ==================================================
     // ONLINE ANSWER EVALUATOR
@@ -603,18 +728,17 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     {
         private readonly string spaceUrl;
         private readonly string hfToken;
-
+        private readonly RTRApiCostTracker apiCostTracker;
 
         public OnlineAnswerEvaluator(
             string spaceUrl,
-            string hfToken
+            string hfToken,
+            RTRApiCostTracker apiCostTracker
         )
         {
-            this.spaceUrl =
-                spaceUrl;
-
-            this.hfToken =
-                hfToken;
+            this.spaceUrl = spaceUrl;
+            this.hfToken = hfToken;
+            this.apiCostTracker = apiCostTracker;
         }
 
 
@@ -628,10 +752,9 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                 new OnlineEvaluationRequest
                 {
                     question =
-                        question.question,
-
-                    description =
-                        question.description,
+                        question != null
+                            ? question.question
+                            : string.Empty,
 
                     expected_answer =
                         expectedAnswer,
@@ -648,7 +771,6 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                         data = new string[]
                         {
                             requestData.question,
-                            requestData.description,
                             requestData.expected_answer,
                             requestData.student_answer
                         }
@@ -657,8 +779,8 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
 
 
             Debug.Log(
-                "Sending ONLINE RTR evaluation request:\n" +
-                requestJson
+                "Sending ONLINE RTR evaluation request " +
+                "(question, expected answer, and student answer only)."
             );
 
 
@@ -821,18 +943,40 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
                 }
 
 
-                RTRValidationResult result =
-                    JsonUtility.FromJson<
-                        RTRValidationResult
-                    >(jsonResult);
+                OnlineEvaluationResponse compactResult =
+                    JsonUtility.FromJson<OnlineEvaluationResponse>(jsonResult);
 
+                if (compactResult == null ||
+                    !jsonResult.Contains("\"correctness\"") ||
+                    string.IsNullOrWhiteSpace(compactResult.reasoning))
+                {
+                    throw new Exception(
+                        "Online RTR response must include correctness and reasoning:\n" +
+                        jsonResult);
+                }
 
-                return result;
+                // Add the LLM cost returned by app.py to the session total.
+                if (compactResult.cost_available && apiCostTracker != null)
+                {
+                    apiCostTracker.RecordLLMCost(
+                        compactResult.llm_cost_usd
+                    );
+                }
+
+                // Adapt the compact online response to the shared result contract
+                // consumed by the tester and other evaluator modes.
+                return new RTRValidationResult
+                {
+                    correctness = compactResult.correctness,
+                    score = compactResult.correctness ? 100 : 0,
+                    severity = compactResult.correctness ? "none" : "major",
+                    reason = compactResult.reasoning
+                };
             }
         }
 
 
-        
+
 
 
 
@@ -913,7 +1057,24 @@ public class RTRAnswerEvaluatorTester : MonoBehaviour
     private class OnlineEvaluationRequest
     {
         public string question;
-        public string description;
+        public string expected_answer;
+        public string student_answer;
+    }
+
+
+    [Serializable]
+    private class OnlineEvaluationResponse
+    {
+        public bool correctness;
+        public string reasoning;
+        public double llm_cost_usd;
+        public bool cost_available;
+    }
+
+
+    [Serializable]
+    private class AlgorithmicEvaluationRequest
+    {
         public string expected_answer;
         public string student_answer;
     }

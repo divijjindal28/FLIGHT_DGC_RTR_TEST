@@ -76,6 +76,12 @@ const char* Whisper_Transcribe(
 
     params.language = "en";
     params.translate = false;
+    params.initial_prompt =
+        "Transcribe in English. Write spoken digit sequences as separate "
+        "number words, not numerals. For example, spoken one five three "
+        "two must be written one five three two, not 1532. Keep runway "
+        "zero eight as runway zero eight. Preserve callsigns, frequencies, "
+        "flight levels, headings, and clearances exactly as spoken.";
 
     int resultCode = whisper_full(
         g_context,

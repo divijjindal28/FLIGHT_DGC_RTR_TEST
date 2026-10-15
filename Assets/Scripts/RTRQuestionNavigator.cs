@@ -412,7 +412,7 @@ public class RTRQuestionNavigator : MonoBehaviour
     // GLOBAL QUESTION NUMBER
     // =========================================================
 
-    private int GetGlobalQuestionNumber()
+    public int GetGlobalQuestionNumber()
     {
         int questionNumber = 0;
 

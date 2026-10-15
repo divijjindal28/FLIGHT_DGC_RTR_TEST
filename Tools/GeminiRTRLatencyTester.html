@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gemini RTR Latency Tester</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    body { margin: 0; background: #10131a; color: #e8edf5; }
+    main { width: min(920px, calc(100% - 32px)); margin: 28px auto 60px; }
+    h1 { margin-bottom: 6px; font-size: 25px; }
+    p { color: #aab5c5; line-height: 1.5; }
+    .card { background: #191f2a; border: 1px solid #2d3747; border-radius: 12px; padding: 18px; margin: 16px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { display: block; font-size: 13px; color: #bdc8d8; margin: 0 0 6px; }
+    input, textarea, select { box-sizing: border-box; width: 100%; color: #f4f7fb; background: #10151e; border: 1px solid #394658; border-radius: 7px; padding: 10px; font: inherit; }
+    textarea { min-height: 100px; resize: vertical; }
+    textarea.prompt { min-height: 190px; }
+    textarea.output { min-height: 180px; font-family: Consolas, monospace; font-size: 12px; }
+    .field { margin-bottom: 14px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    button { border: 0; border-radius: 7px; background: #72a7ff; color: #09111f; padding: 10px 15px; font-weight: 700; cursor: pointer; }
+    button.secondary { background: #344257; color: #eef4ff; }
+    button:disabled { opacity: .55; cursor: wait; }
+    .notice { border-left: 3px solid #e4b45a; padding: 8px 12px; background: #272317; color: #f3dfb2; border-radius: 4px; }
+    .status { font-weight: 700; }
+    .good { color: #77dda4; }
+    .bad { color: #ff8585; }
+    .muted { font-size: 12px; color: #8996a8; }
+    @media (max-width: 650px) { .grid { grid-template-columns: 1fr; gap: 0; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Gemini RTR Latency Tester</h1>
+  <p>Send the same kind of one-shot RTR evaluation request used by the Unity Gemini evaluator. The timer measures the full request from browser send until the response body is received.</p>
+  <div class="notice">For local testing only. The API key is entered in this page and sent from the browser; do not publish this HTML or use a production key in a client-side app.</div>
+
+  <section class="card">
+    <div class="grid">
+      <div class="field">
+        <label for="apiKey">Gemini API key</label>
+        <input id="apiKey" type="password" autocomplete="off" placeholder="Paste API key for this test">
+      </div>
+      <div class="field">
+        <label for="model">Model ID</label>
+        <input id="model" value="gemini-3.5-flash-lite" spellcheck="false">
+      </div>
+    </div>
+    <div class="field">
+      <label for="parentPrompt">Parent prompt / system instruction</label>
+      <textarea id="parentPrompt" class="prompt" placeholder="Paste your RTR_SYSTEM_PROMPT here"></textarea>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label for="question">Question</label>
+        <textarea id="question" placeholder="Enter the RTR question"></textarea>
+      </div>
+      <div class="field">
+        <label for="description">Question description / scenario</label>
+        <textarea id="description" placeholder="Enter the scenario description"></textarea>
+      </div>
+      <div class="field">
+        <label for="expectedAnswer">Expected answer</label>
+        <textarea id="expectedAnswer" placeholder="Enter the reference answer"></textarea>
+      </div>
+      <div class="field">
+        <label for="studentAnswer">Student answer</label>
+        <textarea id="studentAnswer" placeholder="Enter the spoken or transcribed answer"></textarea>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="sendButton" type="button">Send Gemini request</button>
+      <button id="curlButton" class="secondary" type="button">Generate cURL</button>
+      <button id="copyButton" class="secondary" type="button">Copy cURL</button>
+      <span id="status" class="status" aria-live="polite">Ready</span>
+    </div>
+    <p id="timing" class="muted">Elapsed time: —</p>
+  </section>
+
+  <section class="card">
+    <label for="curlOutput">PowerShell command (uses curl.exe)</label>
+    <textarea id="curlOutput" class="output" readonly placeholder="Click Generate cURL"></textarea>
+  </section>
+
+  <section class="card">
+    <label for="responseOutput">Gemini response</label>
+    <textarea id="responseOutput" class="output" readonly placeholder="The model JSON and raw API response will appear here"></textarea>
+  </section>
+  <p class="muted">If the browser request reports a CORS/network error, use the generated curl.exe command in PowerShell. A 503 response means the selected model is temporarily unavailable; the HTTP response and elapsed time are shown here.</p>
+</main>
+
+<script>
+  const byId = id => document.getElementById(id);
+
+  function buildRequest() {
+    const model = byId("model").value.trim();
+    if (!/^[A-Za-z0-9._-]+$/.test(model)) {
+      throw new Error("Model ID can contain only letters, numbers, dots, underscores, and hyphens.");
+    }
+
+    const parentPrompt = byId("parentPrompt").value.trim();
+    if (!parentPrompt) throw new Error("Enter the parent prompt first.");
+
+    const userPrompt =
+      "Evaluate the student's response using the evaluation rules.\n\n" +
+      "QUESTION:\n" + byId("question").value + "\n\n" +
+      "SCENARIO DESCRIPTION:\n" + byId("description").value + "\n\n" +
+      "EXPECTED ANSWER:\n" + byId("expectedAnswer").value + "\n\n" +
+      "STUDENT ANSWER:\n" + byId("studentAnswer").value;
+
+    const body = {
+      systemInstruction: { parts: [{ text: parentPrompt }] },
+      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            score: { type: "INTEGER" },
+            correctness: { type: "BOOLEAN" },
+            severity: { type: "STRING", enum: ["none", "minor", "major", "critical"] },
+            reason: { type: "STRING" }
+          },
+          required: ["score", "correctness", "severity", "reason"]
+        },
+        thinkingConfig: { thinkingLevel: "low" },
+        maxOutputTokens: 1500
+      }
+    };
+
+    return {
+      model,
+      body,
+      apiKey: byId("apiKey").value.trim(),
+      url: "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent"
+    };
+  }
+
+  function setStatus(message, isError = false) {
+    const status = byId("status");
+    status.textContent = message;
+    status.className = "status " + (isError ? "bad" : "good");
+  }
+
+  function powershellQuote(value) {
+    return "'" + value.replace(/'/g, "''") + "'";
+  }
+
+  function makeCurl(config) {
+    return "curl.exe -sS -X POST " + powershellQuote(config.url) +
+      " -H " + powershellQuote("x-goog-api-key: " + config.apiKey) +
+      " -H 'Content-Type: application/json' --data-raw " +
+      powershellQuote(JSON.stringify(config.body));
+  }
+
+  byId("curlButton").addEventListener("click", () => {
+    try {
+      const config = buildRequest();
+      if (!config.apiKey) throw new Error("Enter the API key to generate a complete command.");
+      byId("curlOutput").value = makeCurl(config);
+      setStatus("cURL generated");
+    } catch (error) {
+      setStatus(error.message, true);
+    }
+  });
+
+  byId("copyButton").addEventListener("click", async () => {
+    if (!byId("curlOutput").value) byId("curlButton").click();
+    if (!byId("curlOutput").value) return;
+    try {
+      await navigator.clipboard.writeText(byId("curlOutput").value);
+      setStatus("cURL copied");
+    } catch (_) {
+      byId("curlOutput").focus();
+      byId("curlOutput").select();
+      setStatus("Select and copy the command manually");
+    }
+  });
+
+  byId("sendButton").addEventListener("click", async () => {
+    let config;
+    try {
+      config = buildRequest();
+      if (!config.apiKey) throw new Error("Enter the Gemini API key.");
+    } catch (error) {
+      setStatus(error.message, true);
+      return;
+    }
+
+    byId("sendButton").disabled = true;
+    byId("responseOutput").value = "";
+    byId("timing").textContent = "Elapsed time: request in progress…";
+    setStatus("Sending request…");
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
+    const startedAt = performance.now();
+
+    try {
+      const response = await fetch(config.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": config.apiKey
+        },
+        body: JSON.stringify(config.body),
+        signal: controller.signal
+      });
+      const raw = await response.text();
+      const elapsedMs = performance.now() - startedAt;
+      byId("timing").textContent = "Elapsed time: " + (elapsedMs / 1000).toFixed(2) + " seconds";
+
+      let data;
+      try { data = JSON.parse(raw); } catch (_) { data = null; }
+
+      if (!response.ok) {
+        const message = data && data.error ? data.error.message : raw;
+        byId("responseOutput").value = "HTTP " + response.status + " " + response.statusText +
+          "\n\n" + message + "\n\nRaw response:\n" + raw;
+        setStatus("Request failed (HTTP " + response.status + ")", true);
+      } else {
+        const text = data?.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("") || "No text candidate returned.";
+        byId("responseOutput").value = "Model output:\n" + text + "\n\nRaw API response:\n" +
+          JSON.stringify(data, null, 2);
+        setStatus("Request complete (HTTP " + response.status + ")");
+      }
+    } catch (error) {
+      const elapsedMs = performance.now() - startedAt;
+      byId("timing").textContent = "Elapsed time: " + (elapsedMs / 1000).toFixed(2) + " seconds";
+      byId("responseOutput").value = error.name === "AbortError"
+        ? "Request timed out after 90 seconds."
+        : error.message + "\n\nIf this is a browser CORS restriction, run the generated curl.exe command in PowerShell.";
+      setStatus(error.name === "AbortError" ? "Request timed out" : "Browser request failed", true);
+    } finally {
+      clearTimeout(timeoutId);
+      byId("sendButton").disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlightPhaseData
   flightPhase: 0
   questions:
-  - {fileID: 11400000, guid: 4cd29229c30220e488c0660ac54496cc, type: 2}
   - {fileID: 11400000, guid: 9d49085242ca85443b998179e39a2e6b, type: 2}
   - {fileID: 11400000, guid: 404a56340dd400c4e9043381ad8663d9, type: 2}
   - {fileID: 11400000, guid: 89881be7190002549bbff4d6a0f43108, type: 2}

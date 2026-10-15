@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ElevenLabs Speech to Text Tester</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    body { margin: 0; background: #10131a; color: #e8edf5; }
+    main { width: min(820px, calc(100% - 32px)); margin: 32px auto 60px; }
+    h1 { font-size: 25px; margin-bottom: 6px; }
+    p { color: #aab5c5; line-height: 1.5; }
+    .card { background: #191f2a; border: 1px solid #2d3747; border-radius: 12px; padding: 18px; margin: 16px 0; }
+    label { display: block; font-size: 13px; color: #bdc8d8; margin: 0 0 6px; }
+    input, textarea, select, button { box-sizing: border-box; width: 100%; color: #f4f7fb; background: #10151e; border: 1px solid #394658; border-radius: 7px; padding: 10px; font: inherit; }
+    textarea { min-height: 150px; resize: vertical; }
+    .field { margin-bottom: 14px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    button { cursor: pointer; font-weight: 650; background: #315caa; border-color: #4776ca; }
+    button.secondary { background: #263142; border-color: #435268; }
+    button:disabled { opacity: .55; cursor: wait; }
+    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    #status { min-height: 22px; color: #aab5c5; }
+    .note { font-size: 12px; color: #929fb1; }
+    @media (max-width: 600px) { .row, .buttons { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>ElevenLabs Speech to Text</h1>
+  <p>Enter your ElevenLabs API key, record a short clip, and transcribe it with Scribe. You can also choose an audio file.</p>
+  <section class="card">
+    <div class="field">
+      <label for="apiKey">ElevenLabs API key</label>
+      <input id="apiKey" type="password" autocomplete="off" placeholder="Paste your xi-api-key">
+      <div class="note">The key is kept only in this page's memory and sent directly to api.elevenlabs.io. Do not share or publish this file with a key saved in it.</div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="model">Model</label>
+        <select id="model"><option value="scribe_v2">Scribe v2</option><option value="scribe_v2_medical">Scribe v2 Medical</option></select>
+      </div>
+      <div class="field">
+        <label for="language">Language (optional, e.g. en)</label>
+        <input id="language" placeholder="Auto-detect">
+      </div>
+    </div>
+    <div class="field">
+      <label for="audioFile">Or choose an audio file</label>
+      <input id="audioFile" type="file" accept="audio/*,video/*">
+    </div>
+    <div class="buttons">
+      <button id="recordButton" type="button">🎙 Start recording</button>
+      <button id="transcribeButton" class="secondary" type="button">Transcribe selected file</button>
+    </div>
+    <p id="status" role="status">Ready.</p>
+  </section>
+  <section class="card">
+    <div class="field"><label for="transcript">Transcript</label><textarea id="transcript" placeholder="Your recognized speech will appear here..."></textarea></div>
+    <div id="details" class="note"></div>
+  </section>
+  <p class="note">Microphone access requires a secure context (HTTPS or localhost). Direct browser API calls may be blocked by browser CORS policy; if so, this page will show the error and the request needs a small local proxy.</p>
+</main>
+<script>
+(() => {
+  const apiKey = document.querySelector('#apiKey');
+  const model = document.querySelector('#model');
+  const language = document.querySelector('#language');
+  const fileInput = document.querySelector('#audioFile');
+  const recordButton = document.querySelector('#recordButton');
+  const transcribeButton = document.querySelector('#transcribeButton');
+  const status = document.querySelector('#status');
+  const transcript = document.querySelector('#transcript');
+  const details = document.querySelector('#details');
+  let recorder = null;
+  let chunks = [];
+  let recordedBlob = null;
+
+  function setBusy(busy, message) {
+    transcribeButton.disabled = busy;
+    recordButton.disabled = busy;
+    status.textContent = message;
+  }
+
+  async function transcribe(blob, filename) {
+    const key = apiKey.value.trim();
+    if (!key) { status.textContent = 'Enter your ElevenLabs API key first.'; return; }
+    if (!blob || blob.size === 0) { status.textContent = 'No audio found. Record something or choose a file.'; return; }
+    const form = new FormData();
+    form.append('file', blob, filename);
+    form.append('model_id', model.value);
+    form.append('tag_audio_events', 'false');
+    if (language.value.trim()) form.append('language_code', language.value.trim());
+    setBusy(true, 'Transcribing…');
+    transcript.value = '';
+    details.textContent = '';
+    const start = performance.now();
+    try {
+      const response = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+        method: 'POST',
+        headers: { 'xi-api-key': key },
+        body: form
+      });
+      const body = await response.text();
+      let data;
+      try { data = JSON.parse(body); } catch { data = null; }
+      if (!response.ok) {
+        const message = data?.detail?.message || data?.detail || data?.error?.message || body || response.statusText;
+        throw new Error(`HTTP ${response.status}: ${typeof message === 'string' ? message : JSON.stringify(message)}`);
+      }
+      if (!data || typeof data.text !== 'string') throw new Error('The API response did not contain transcript text.');
+      transcript.value = data.text;
+      const elapsed = ((performance.now() - start) / 1000).toFixed(2);
+      details.textContent = `Completed in ${elapsed}s${data.language_code ? ` · Language: ${data.language_code}` : ''}${data.language_probability != null ? ` · Confidence: ${(data.language_probability * 100).toFixed(1)}%` : ''}`;
+      status.textContent = 'Transcription complete.';
+    } catch (error) {
+      status.textContent = `Request failed: ${error.message}`;
+      if (error instanceof TypeError) status.textContent += ' This may be a browser CORS or network restriction.';
+    } finally {
+      transcribeButton.disabled = false;
+      recordButton.disabled = false;
+    }
+  }
+
+  recordButton.addEventListener('click', async () => {
+    if (recorder && recorder.state === 'recording') {
+      recorder.stop();
+      recordButton.disabled = true;
+      status.textContent = 'Finishing recording…';
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      status.textContent = 'This browser does not support microphone recording. Open this page on HTTPS or localhost in a recent browser.';
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+      const options = {};
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) options.mimeType = 'audio/webm;codecs=opus';
+      recorder = new MediaRecorder(stream, options);
+      recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
+      recorder.onstop = () => {
+        recordedBlob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+        stream.getTracks().forEach(track => track.stop());
+        recordButton.disabled = false;
+        recordButton.textContent = '🎙 Record again';
+        status.textContent = 'Recording ready. Sending it for transcription…';
+        transcribe(recordedBlob, recorder.mimeType.includes('ogg') ? 'recording.ogg' : 'recording.webm');
+      };
+      recorder.start();
+      recordButton.textContent = '■ Stop and transcribe';
+      status.textContent = 'Recording… speak, then press Stop and transcribe.';
+    } catch (error) {
+      status.textContent = `Could not access microphone: ${error.message}`;
+    }
+  });
+
+  transcribeButton.addEventListener('click', () => {
+    const file = fileInput.files?.[0];
+    if (!file) { status.textContent = 'Choose an audio file, or use the microphone button.'; return; }
+    transcribe(file, file.name);
+  });
+})();
+</script>
+</body>
+</html>

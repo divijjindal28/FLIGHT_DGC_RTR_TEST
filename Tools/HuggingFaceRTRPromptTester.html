@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hugging Face Prompt Latency Tester</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    body { margin: 0; background: #10131a; color: #e8edf5; }
+    main { width: min(920px, calc(100% - 32px)); margin: 28px auto 60px; }
+    h1 { margin-bottom: 6px; font-size: 25px; }
+    p { color: #aab5c5; line-height: 1.5; }
+    .card { background: #191f2a; border: 1px solid #2d3747; border-radius: 12px; padding: 18px; margin: 16px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { display: block; font-size: 13px; color: #bdc8d8; margin: 0 0 6px; }
+    input, textarea { box-sizing: border-box; width: 100%; color: #f4f7fb; background: #10151e; border: 1px solid #394658; border-radius: 7px; padding: 10px; font: inherit; }
+    textarea { min-height: 120px; resize: vertical; }
+    textarea.prompt { min-height: 190px; }
+    textarea.output { min-height: 220px; }
+    .field { margin-bottom: 14px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    button { border: 0; border-radius: 7px; background: #72a7ff; color: #09111f; padding: 10px 15px; font-weight: 700; cursor: pointer; }
+    button.secondary { background: #344257; color: #eef4ff; }
+    button:disabled { opacity: .55; cursor: wait; }
+    .notice { border-left: 3px solid #e4b45a; padding: 8px 12px; background: #272317; color: #f3dfb2; border-radius: 4px; }
+    .status { font-weight: 700; }
+    .good { color: #77dda4; }
+    .bad { color: #ff8585; }
+    .muted { font-size: 12px; color: #8996a8; }
+    @media (max-width: 650px) { .grid { grid-template-columns: 1fr; gap: 0; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Hugging Face Prompt Latency Tester</h1>
+  <p>Sends a parent prompt as the system message and a child prompt as the user message to the Hugging Face chat-completions API. The timer starts when you press Send and stops after the complete response has arrived and been read.</p>
+  <div class="notice">For local testing only. Your access token is kept in this page's memory and sent directly to Hugging Face. Do not publish this file with a token or use a production token in a client-side app.</div>
+
+  <section class="card">
+    <div class="grid">
+      <div class="field">
+        <label for="token">Hugging Face access token</label>
+        <input id="token" type="password" autocomplete="off" placeholder="hf_… (needs Inference Providers permission)">
+      </div>
+      <div class="field">
+        <label for="model">Model ID</label>
+        <input id="model" value="Qwen/Qwen3-32B:fastest" spellcheck="false">
+        <div class="muted">Default: Qwen3 32B, routed to the fastest available provider.</div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="parentPrompt">Parent prompt (system)</label>
+      <textarea id="parentPrompt" class="prompt" placeholder="Paste the persistent instructions for the model"></textarea>
+    </div>
+    <div class="field">
+      <label for="childPrompt">Child prompt (user)</label>
+      <textarea id="childPrompt" placeholder="Enter the actual question or task to send"></textarea>
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label for="maxTokens">Maximum response tokens</label>
+        <input id="maxTokens" type="number" min="1" max="8192" value="1024">
+      </div>
+      <div class="field">
+        <label for="temperature">Temperature (0–2)</label>
+        <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.2">
+      </div>
+    </div>
+    <div class="actions">
+      <button id="sendButton" type="button">Send prompt</button>
+      <button id="copyButton" class="secondary" type="button">Copy response</button>
+      <span id="status" class="status" aria-live="polite">Ready</span>
+    </div>
+    <p id="timing" class="muted">Send-to-complete time: —</p>
+  </section>
+
+  <section class="card">
+    <label for="response">Model answer</label>
+    <textarea id="response" class="output" readonly placeholder="The model's answer will appear here"></textarea>
+    <p id="metadata" class="muted"></p>
+  </section>
+  <p class="muted">This measures full response latency, not time-to-first-token. If the browser reports a CORS/network error, try serving this HTML from localhost or use a small local proxy. HTTP errors, including provider/model errors, are shown in the status and response fields.</p>
+</main>
+
+<script>
+  const byId = id => document.getElementById(id);
+  const endpoint = "https://router.huggingface.co/v1/chat/completions";
+
+  async function sendPrompt() {
+    const startedAt = performance.now();
+    const token = byId("token").value.trim();
+    const model = byId("model").value.trim();
+    const parentPrompt = byId("parentPrompt").value;
+    const childPrompt = byId("childPrompt").value;
+    const maxTokens = Number(byId("maxTokens").value);
+    const temperature = Number(byId("temperature").value);
+
+    byId("response").value = "";
+    byId("metadata").textContent = "";
+    byId("timing").textContent = "Send-to-complete time: measuring…";
+    byId("status").textContent = "Sending…";
+    byId("status").className = "status";
+    byId("sendButton").disabled = true;
+
+    try {
+      if (!token) throw new Error("Enter a Hugging Face access token first.");
+      if (!model) throw new Error("Enter a model ID.");
+      if (!childPrompt.trim()) throw new Error("Enter a child prompt.");
+      if (!Number.isInteger(maxTokens) || maxTokens < 1 || maxTokens > 8192)
+        throw new Error("Maximum response tokens must be between 1 and 8192.");
+      if (!Number.isFinite(temperature) || temperature < 0 || temperature > 2)
+        throw new Error("Temperature must be between 0 and 2.");
+
+      const messages = [];
+      if (parentPrompt.trim()) messages.push({ role: "system", content: parentPrompt });
+      messages.push({ role: "user", content: childPrompt });
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          max_tokens: maxTokens,
+          temperature,
+          stream: false
+        })
+      });
+      const rawBody = await response.text();
+      let data;
+      try { data = JSON.parse(rawBody); } catch { data = null; }
+      const elapsed = ((performance.now() - startedAt) / 1000).toFixed(2);
+      byId("timing").textContent = `Send-to-complete time: ${elapsed} seconds`;
+
+      if (!response.ok) {
+        const message = data?.error?.message || data?.message || rawBody || response.statusText;
+        byId("response").value = typeof message === "string" ? message : JSON.stringify(message, null, 2);
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const answer = data?.choices?.[0]?.message?.content;
+      if (typeof answer !== "string") {
+        byId("response").value = JSON.stringify(data, null, 2);
+        throw new Error("The API response did not contain a text answer. Raw response shown below.");
+      }
+
+      byId("response").value = answer.trim();
+      const usage = data.usage;
+      const finishReason = data.choices?.[0]?.finish_reason;
+      byId("metadata").textContent = [
+        `Model returned: ${data.model || model}`,
+        finishReason ? `Finish reason: ${finishReason}` : "",
+        usage?.prompt_tokens != null ? `Prompt tokens: ${usage.prompt_tokens}` : "",
+        usage?.completion_tokens != null ? `Completion tokens: ${usage.completion_tokens}` : ""
+      ].filter(Boolean).join(" · ");
+      byId("status").textContent = "Response received";
+      byId("status").className = "status good";
+    } catch (error) {
+      const elapsed = ((performance.now() - startedAt) / 1000).toFixed(2);
+      byId("timing").textContent = `Send-to-error time: ${elapsed} seconds`;
+      byId("status").textContent = `Request failed: ${error.message}`;
+      byId("status").className = "status bad";
+      if (error instanceof TypeError) {
+        byId("response").value = "The browser could not complete the request. This can be a CORS, network, or connection issue. If opened as file://, try serving the Tools folder from localhost.";
+      }
+    } finally {
+      byId("sendButton").disabled = false;
+    }
+  }
+
+  byId("sendButton").addEventListener("click", sendPrompt);
+  byId("copyButton").addEventListener("click", async () => {
+    const value = byId("response").value;
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      byId("status").textContent = "Response copied";
+      byId("status").className = "status good";
+    } catch {
+      byId("status").textContent = "Could not access clipboard. Select and copy the response manually.";
+      byId("status").className = "status bad";
+    }
+  });
+</script>
+</body>
+</html>

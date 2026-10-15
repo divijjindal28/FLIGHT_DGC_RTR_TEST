@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
+  m_Name: RTRInteractionData 1
+  m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
+  atcQuestion: 
+  atcAudio: {fileID: 0}
+  expectedAnswer: Vijayawada Departure, Akasa Air one five three two, passing three
+    thousand feet, maintaining five thousand feet, request climb flight level three
+    five zero
+  atcWrongAnswerResponse: Akasa Air one five three two, say again your request.
+  atcWrongAnswerAudio: {fileID: 8300000, guid: 0ddf7349f9b2dc84b80b040163db1e79, type: 3}

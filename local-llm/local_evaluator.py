@@ -1,6 +1,13 @@
 import json
+import os
+import re
+import sys
 import requests
 from flask import Flask, request, jsonify
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "python-packages"))
+
+from rapidfuzz import fuzz
 
 
 # --------------------------------------------------
@@ -318,6 +325,82 @@ STUDENT ANSWER:
     # --------------------------------------------------
 
     return jsonify(evaluation)
+
+
+def normalize_algorithmic_answer(answer):
+    """Apply the existing evaluator's aviation-number and text normalization."""
+    normalized = answer.lower()
+    normalized = re.sub(r"\b2000\b", "two thousand", normalized)
+    normalized = re.sub(r"\b8000\b", "eight thousand", normalized)
+    normalized = re.sub(r"[\W_]+", " ", normalized)
+    return " ".join(normalized.split())
+
+
+@app.route("/algorithmic_evaluate", methods=["POST"])
+def algorithmic_evaluate():
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({"error": "No JSON data received."}), 400
+
+    expected_answer = data.get("expected_answer", "")
+    student_answer = data.get("student_answer", "")
+
+    if not isinstance(expected_answer, str) or not isinstance(student_answer, str):
+        return jsonify({"error": "Answers must be strings."}), 400
+
+    normalized_expected = normalize_algorithmic_answer(expected_answer)
+    normalized_student = normalize_algorithmic_answer(student_answer)
+
+    similarity = (
+        fuzz.ratio(normalized_expected, normalized_student)
+        if normalized_expected and normalized_student
+        else 0.0
+    )
+    score = round(similarity)
+    correctness = score >= 85
+
+    return jsonify({
+        "score": score,
+        "correctness": correctness,
+        "severity": "",
+        "reason": f"RapidFuzz ratio: {similarity:.2f}%",
+    })
+
+
+@app.route("/rapidfuzz_compare", methods=["POST"])
+def rapidfuzz_compare():
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({"error": "No JSON data received."}), 400
+
+    string_a = data.get("string_a", "")
+    string_b = data.get("string_b", "")
+    scorer_name = data.get("scorer", "ratio")
+
+    if not isinstance(string_a, str) or not isinstance(string_b, str):
+        return jsonify({"error": "String A and String B must be strings."}), 400
+
+    scorers = {
+        "ratio": fuzz.ratio,
+        "partial_ratio": fuzz.partial_ratio,
+        "token_sort_ratio": fuzz.token_sort_ratio,
+        "token_set_ratio": fuzz.token_set_ratio,
+        "weighted_ratio": fuzz.WRatio,
+        "quick_ratio": fuzz.QRatio,
+    }
+    scorer = scorers.get(scorer_name)
+    if scorer is None:
+        return jsonify({"error": f"Unsupported RapidFuzz scorer: {scorer_name}"}), 400
+
+    score = scorer(string_a, string_b)
+    return jsonify({"scorer": scorer_name, "score": score})
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ready"})
 
 
 # --------------------------------------------------

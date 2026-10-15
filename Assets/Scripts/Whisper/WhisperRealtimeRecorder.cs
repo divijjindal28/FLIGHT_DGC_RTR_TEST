@@ -1,14 +1,25 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public enum WhisperModel
 {
     BaseEnglish,
-    SmallEnglish
+    SmallEnglish,
+    MediumEnglish
+}
+
+public enum SpeechRecognitionMode
+{
+    OfflineWhisper,
+    OnlineElevenLabs
 }
 
 public class WhisperRealtimeRecorder : MonoBehaviour
@@ -23,6 +34,20 @@ public class WhisperRealtimeRecorder : MonoBehaviour
     [SerializeField]
     private WhisperModel whisperModel =
         WhisperModel.BaseEnglish;
+
+    [Header("Speech Recognition Mode")]
+    [SerializeField]
+    private SpeechRecognitionMode recognitionMode =
+        SpeechRecognitionMode.OfflineWhisper;
+
+    [Header("ElevenLabs (Online Mode)")]
+    [Tooltip("Stored in the scene if entered. Do not commit this key or ship it in a public client build.")]
+    [SerializeField] private string elevenLabsApiKey;
+    [SerializeField] private string elevenLabsModelId = "scribe_v2";
+    [SerializeField] private string elevenLabsLanguageCode = "en";
+    [SerializeField] private RTRApiCostTracker apiCostTracker;
+
+    private const double ElevenLabsUsdPerAudioHour = 0.22;
 
     [Header("Recording")]
     [SerializeField] private int sampleRate = 16000;
@@ -40,15 +65,15 @@ public class WhisperRealtimeRecorder : MonoBehaviour
     private bool transcriptionInProgress;
 
     private Task<string> transcriptionTask;
+    private Coroutine onlineTranscriptionCoroutine;
+    private UnityWebRequest activeRequest;
 
     private UIProceduralRoundedRect recordButtonBackground;
 
     private void Start()
     {
-        LoadWhisper();
-
-        if (!modelLoaded)
-            return;
+        if (recognitionMode == SpeechRecognitionMode.OfflineWhisper)
+            LoadWhisper();
 
         SetupButton();
 
@@ -72,6 +97,10 @@ public class WhisperRealtimeRecorder : MonoBehaviour
 
             case WhisperModel.SmallEnglish:
                 modelFileName = "ggml-small.en.bin";
+                break;
+
+            case WhisperModel.MediumEnglish:
+                modelFileName = "ggml-medium.en.bin";
                 break;
 
             default:
@@ -204,12 +233,22 @@ public class WhisperRealtimeRecorder : MonoBehaviour
 
     private void StartRecording()
     {
-        if (!modelLoaded)
+        if (recognitionMode == SpeechRecognitionMode.OfflineWhisper && !modelLoaded)
         {
             Debug.LogError(
                 "Cannot start recording because Whisper is not loaded."
             );
 
+            return;
+        }
+
+        if (recognitionMode == SpeechRecognitionMode.OnlineElevenLabs &&
+            string.IsNullOrWhiteSpace(elevenLabsApiKey))
+        {
+            Debug.LogError(
+                "Cannot start recording because the ElevenLabs API key is empty. " +
+                "Set it in the WhisperRealtimeRecorder Inspector."
+            );
             return;
         }
 
@@ -389,16 +428,23 @@ public class WhisperRealtimeRecorder : MonoBehaviour
             monoSamples.Length
         );
 
-        StartTranscription(
-            monoSamples
-        );
+        if (recognitionMode == SpeechRecognitionMode.OnlineElevenLabs)
+        {
+            onlineTranscriptionCoroutine = StartCoroutine(
+                TranscribeWithElevenLabs(monoSamples, microphoneClip.frequency)
+            );
+        }
+        else
+        {
+            StartWhisperTranscription(monoSamples);
+        }
     }
 
     // =========================================================
     // TRANSCRIPTION
     // =========================================================
 
-    private void StartTranscription(
+    private void StartWhisperTranscription(
         float[] samples
     )
     {
@@ -480,37 +526,196 @@ public class WhisperRealtimeRecorder : MonoBehaviour
         transcriptionInProgress = false;
         transcriptionTask = null;
 
-        if (string.IsNullOrWhiteSpace(result))
+        HandleTranscriptionResult(result, "Whisper");
+    }
+
+    private IEnumerator TranscribeWithElevenLabs(float[] samples, int audioSampleRate)
+    {
+        transcriptionInProgress = true;
+
+        if (samples == null || samples.Length == 0 || audioSampleRate <= 0)
         {
-            Debug.LogWarning(
-                "Whisper returned an empty transcription."
+            transcriptionInProgress = false;
+            onlineTranscriptionCoroutine = null;
+            Debug.LogError("ElevenLabs transcription received invalid audio data.");
+            yield break;
+        }
+
+        byte[] wavData = EncodeMonoPcm16Wav(samples, audioSampleRate);
+        List<IMultipartFormSection> form = new List<IMultipartFormSection>
+        {
+            new MultipartFormFileSection("file", wavData, "recording.wav", "audio/wav"),
+            new MultipartFormDataSection("model_id", elevenLabsModelId),
+            new MultipartFormDataSection("tag_audio_events", "false"),
+            new MultipartFormDataSection(
+                "transcript_edit",
+                "For aviation radiotelephony, write spoken numbers as English words rather than numeric digits. " +
+                "Preserve aviation phraseology exactly. For example, write 'heading zero niner zero', not 'heading 090'. " +
+                "Do not convert spoken digit sequences into numeric digits. Do not change the meaning or add words."
+            )
+        };
+
+        if (!string.IsNullOrWhiteSpace(elevenLabsLanguageCode))
+        {
+            form.Add(new MultipartFormDataSection(
+                "language_code",
+                elevenLabsLanguageCode.Trim()
+            ));
+        }
+
+        string result = string.Empty;
+        bool requestSucceeded = false;
+        using (UnityWebRequest request = UnityWebRequest.Post(
+                   "https://api.elevenlabs.io/v1/speech-to-text",
+                   form))
+        {
+            activeRequest = request;
+            request.SetRequestHeader("xi-api-key", elevenLabsApiKey.Trim());
+            request.timeout = 120;
+
+            Debug.Log(
+                "Sending recorded audio to ElevenLabs (" +
+                elevenLabsModelId + ", " + audioSampleRate + " Hz)."
             );
 
+            yield return request.SendWebRequest();
+            activeRequest = null;
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError(
+                    "ElevenLabs transcription failed (HTTP " +
+                    request.responseCode + "): " +
+                    request.error + "\n" +
+                    request.downloadHandler.text
+                );
+            }
+            else
+            {
+                if (apiCostTracker != null)
+                {
+                    double audioSeconds =
+                        samples.Length / (double)audioSampleRate;
+
+                    apiCostTracker.RecordElevenLabsAudioCost(
+                        audioSeconds,
+                        ElevenLabsUsdPerAudioHour
+                    );
+                }
+                try
+                {
+                    ElevenLabsTranscriptResponse response =
+                        JsonUtility.FromJson<ElevenLabsTranscriptResponse>(
+                            request.downloadHandler.text
+                        );
+
+                    if (response != null)
+                    {
+                        // Use the edited transcript when ElevenLabs returns one.
+                        // Fall back to the original transcript if editing is unavailable.
+                        result = response.text;
+
+                        if (response.edited_transcript != null &&
+                            response.edited_transcript.kind == "transcript" &&
+                            !string.IsNullOrWhiteSpace(response.edited_transcript.text))
+                        {
+                            result = response.edited_transcript.text;
+                        }
+
+                        requestSucceeded = true;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError(
+                        "Could not parse ElevenLabs transcription response: " +
+                        exception.Message + "\n" +
+                        request.downloadHandler.text
+                    );
+                }
+            }
+        }
+
+        transcriptionInProgress = false;
+        onlineTranscriptionCoroutine = null;
+
+        if (requestSucceeded)
+            HandleTranscriptionResult(result, "ElevenLabs");
+    }
+
+    private void HandleTranscriptionResult(string result, string providerName)
+    {
+        if (string.IsNullOrWhiteSpace(result))
+        {
+            Debug.LogWarning(providerName + " returned an empty transcription.");
             return;
         }
 
         result = result.Trim();
-
-        Debug.Log(
-            "FINAL WHISPER RESULT: " +
-            result
-        );
+        Debug.Log("FINAL " + providerName.ToUpperInvariant() + " RESULT: " + result);
 
         if (transcriptText != null)
-        {
             transcriptText.text = result;
-        }
-      
 
         if (transcriptInputField != null)
-        {
             transcriptInputField.text = result;
-        }
 
         if (sendButton != null)
-        {
             sendButton.onClick.Invoke();
+    }
+
+    [Serializable]
+    private class ElevenLabsTranscriptResponse
+    {
+        public string text;
+        public EditedTranscript edited_transcript;
+    }
+
+    [Serializable]
+    private class EditedTranscript
+    {
+        public string kind;
+        public string text;
+        public string error_type;
+        public string message;
+    }
+
+    private static byte[] EncodeMonoPcm16Wav(float[] samples, int audioSampleRate)
+    {
+        const int headerSize = 44;
+        const short bitsPerSample = 16;
+        const short channels = 1;
+        int dataSize = samples.Length * sizeof(short);
+        byte[] wav = new byte[headerSize + dataSize];
+
+        using (MemoryStream stream = new MemoryStream(wav))
+        using (BinaryWriter writer = new BinaryWriter(stream))
+        {
+            writer.Write(Encoding.ASCII.GetBytes("RIFF"));
+            writer.Write(36 + dataSize);
+            writer.Write(Encoding.ASCII.GetBytes("WAVE"));
+            writer.Write(Encoding.ASCII.GetBytes("fmt "));
+            writer.Write(16);
+            writer.Write((short)1);
+            writer.Write(channels);
+            writer.Write(audioSampleRate);
+            writer.Write(audioSampleRate * channels * bitsPerSample / 8);
+            writer.Write((short)(channels * bitsPerSample / 8));
+            writer.Write(bitsPerSample);
+            writer.Write(Encoding.ASCII.GetBytes("data"));
+            writer.Write(dataSize);
+
+            for (int i = 0; i < samples.Length; i++)
+            {
+                float clampedSample = Mathf.Clamp(samples[i], -1f, 1f);
+                short pcmSample = (short)(clampedSample < 0f
+                    ? clampedSample * 32768f
+                    : clampedSample * 32767f);
+                writer.Write(pcmSample);
+            }
         }
+
+        return wav;
     }
 
     // =========================================================
@@ -577,6 +782,13 @@ public class WhisperRealtimeRecorder : MonoBehaviour
             }
         }
 
-        WhisperNative.Whisper_UnloadModel();
+        if (activeRequest != null)
+            activeRequest.Abort();
+
+        if (onlineTranscriptionCoroutine != null)
+            StopCoroutine(onlineTranscriptionCoroutine);
+
+        if (modelLoaded)
+            WhisperNative.Whisper_UnloadModel();
     }
 }

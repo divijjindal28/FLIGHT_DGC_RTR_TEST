@@ -259,6 +259,21 @@ public class RTRLocalAIServerWindow : EditorWindow
 
 
         // --------------------------------------------------
+        GUI.enabled = true;
+
+        GUILayout.Space(5);
+
+        GUI.enabled = !isStarting && !IsEvaluatorRunning();
+
+        if (GUILayout.Button(
+            "START RAPIDFUZZ ONLY",
+            GUILayout.Height(35)))
+        {
+            StartAlgorithmicEvaluator();
+        }
+
+        GUI.enabled = true;
+        GUILayout.Space(5);
         // Stop
         // --------------------------------------------------
 
@@ -304,6 +319,73 @@ public class RTRLocalAIServerWindow : EditorWindow
     // --------------------------------------------------
     // Start Local AI
     // --------------------------------------------------
+
+    // --------------------------------------------------
+    // Start Algorithmic Evaluator Without LLM
+    // --------------------------------------------------
+
+    private void StartAlgorithmicEvaluator()
+    {
+        if (isStarting || IsEvaluatorRunning())
+            return;
+
+        if (!File.Exists(pythonPath))
+        {
+            statusMessage = "ERROR: Python executable not found.";
+            Repaint();
+            return;
+        }
+
+        if (!File.Exists(evaluatorScriptPath))
+        {
+            statusMessage = "ERROR: local_evaluator.py not found.";
+            Repaint();
+            return;
+        }
+
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string rapidFuzzPath = Path.Combine(
+            projectRoot,
+            "local-llm",
+            "python-packages",
+            "rapidfuzz",
+            "__init__.py"
+        );
+
+        if (!File.Exists(rapidFuzzPath))
+        {
+            statusMessage = "ERROR: Install local-llm requirements first.";
+            Repaint();
+            return;
+        }
+
+        isStarting = true;
+        startupStage = StartupStage.StartingEvaluator;
+        statusMessage = "STARTING RAPIDFUZZ EVALUATOR...";
+
+        StartEvaluator();
+
+        if (!IsEvaluatorRunning())
+        {
+            StartupFailed("Could not start RapidFuzz evaluator.");
+            return;
+        }
+
+        startupStage = StartupStage.WaitingForEvaluator;
+        WaitForService(
+            "http://127.0.0.1:5000/health",
+            OnAlgorithmicEvaluatorReady
+        );
+    }
+
+
+    private void OnAlgorithmicEvaluatorReady()
+    {
+        startupStage = StartupStage.Ready;
+        isStarting = false;
+        statusMessage = "RAPIDFUZZ EVALUATOR READY (LLM NOT STARTED)";
+        Repaint();
+    }
 
     private void StartLocalAI()
     {

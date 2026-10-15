@@ -16,7 +16,7 @@ MonoBehaviour:
   phase:
   - flightPhase: 0
     map: {fileID: 21300000, guid: 6ed7f45a4ab154a4fb73ce962aca6952, type: 3}
-    flightPhaseData: {fileID: 11400000, guid: 4f39a49317963fd4892b5da2bf288a4f, type: 2}
+    flightPhaseData: {fileID: 11400000, guid: efd23570e1b1dbc47bfdc3331b6cf815, type: 2}
   - flightPhase: 2
     map: {fileID: 21300000, guid: 0ce9804de7b889749b5253586e385a9f, type: 3}
     flightPhaseData: {fileID: 11400000, guid: 192ca7c8458289949bacf00eaa0af5cf, type: 2}
