@@ -15,6 +15,6 @@ MonoBehaviour:
   question: 'Transmit the following phrases as per radiotelephony procedure: QTE'
   description: 
   scenarioType: 0
-  answer: Quebec Tango Echo
+  answer: QTE
   requiresATCInteraction: 0
   interactions: []

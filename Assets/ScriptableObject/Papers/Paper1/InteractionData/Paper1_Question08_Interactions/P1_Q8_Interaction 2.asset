@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
   m_Name: P1_Q8_Interaction 2
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
-  atcQuestion: AKASA AIR One Four Two, taxi via Echo approved. Hold short of Runway
-    Two Seven. Contact Tower One Two Two decimal Five.
+  atcQuestion: AKASA AIR One Four Two, taxi via Echo. Hold short of Runway Two Seven.
+    Contact Tower on One Two Two decimal Five.
   atcAudio: {fileID: 8300000, guid: 5c21bef15410fad4bbf11eb6404669f9, type: 3}
-  expectedAnswer: Taxi via Echo approved. Hold short of Runway Two Seven. Tower One
-    Two Two decimal Five. AKASA AIR One Four Two.
+  expectedAnswer: Taxi via Echo. Hold short of Runway Two Seven. Tower One Two Two
+    decimal Five. AKASA AIR One Four Two.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

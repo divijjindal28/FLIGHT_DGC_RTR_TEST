@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: Lucknow Ground, AKASA AIR One Four Two, stand One Zero Five Left,
-    information Bravo, QNH One Zero One Five, IFR to Kolkata request start-up and
-    ATC clearance.
+  expectedAnswer: Lucknow Ground, AKASA AIR One Four Two, Boing 737, on one one eight
+    decimal six, stand One Zero Five Left, sequrity checks carried out, persons on
+    board one six niner, QNH one zero one two, IFR to Kolkata, request start up and
+    ATC clearence, Information Bravo.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

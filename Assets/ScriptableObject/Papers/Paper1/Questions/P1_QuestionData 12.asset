@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
   m_Name: P1_QuestionData 12
   m_EditorClassIdentifier: Assembly-CSharp::QuestionData
-  question: Relay information for VGC to Varanasi Control.
+  question: 'Relay information to Varanasi Control: Varanasi control VGC Sessna 172,
+    position 50NM, west of Gaya, maintaining 3000 feet on QNH 998 VMC estimating
+    Gaya 0431.'
   description: 
   scenarioType: 0
   answer: 

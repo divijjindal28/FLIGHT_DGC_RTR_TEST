@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: STOPPING, STOPPING, STOPPING. AKASA AIR One Four Two, vehicle on
-    the Runway.
+  expectedAnswer: Lucknow Tower, AKASA AIR One Four Two, on one two two decimal five,
+    ABANDONING Take off, due vehicle on Runway.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

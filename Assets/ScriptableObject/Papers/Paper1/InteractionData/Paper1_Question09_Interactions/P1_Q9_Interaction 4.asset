@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
   m_Name: P1_Q9_Interaction 4
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
-  atcQuestion: AKASA AIR One Four Two clear take off, surface wind light and variable.
+  atcQuestion: AKASA AIR One Four Two clear take off, surface winds light and variable.
   atcAudio: {fileID: 8300000, guid: fd51ec40998ff80498769b7ce94b1a69, type: 3}
-  expectedAnswer: Clear take off, AKASA AIR One Four Two.
+  expectedAnswer: Cleared for take off, AKASA AIR One Four Two.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

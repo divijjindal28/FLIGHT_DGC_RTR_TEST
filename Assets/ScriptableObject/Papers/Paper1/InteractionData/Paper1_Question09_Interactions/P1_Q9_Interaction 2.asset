@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: AKASA AIR One Four Two, roger.
   atcAudio: {fileID: 8300000, guid: 61eb04b5bd96791418fe9b0da37164de, type: 3}
-  expectedAnswer: Lucknow Tower AKASA AIR One Four Two under control. Request backtrack
-    and line up Runway Two Seven for another departure.
+  expectedAnswer: Lucknow Tower AKASA AIR One Four Two, request new taxi instructions
+    to line up runway two seven for another departure.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d888eedf8da14c4e92d240c4f4c05be, type: 3}
+  m_Name: P3_METARInfoData
+  m_EditorClassIdentifier: Assembly-CSharp::METARInfoData
+  station: VIDP
+  time: 191200Z
+  wind: 280/08KT
+  visibility: 2000 m
+  temperature: 18
+  dewpoint: 12
+  qnh: 1015
+  weather: HAZE
+  trend: '-'
+  otherInfo: RVR RWY28 1500 m; BKN080

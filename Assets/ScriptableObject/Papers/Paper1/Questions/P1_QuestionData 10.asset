@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
   m_Name: P1_QuestionData 10
   m_EditorClassIdentifier: Assembly-CSharp::QuestionData
-  question: You have departed Lucknow. Passing 2700 ft, cleared to level 18000 feet,
-    request higher level 20000 feet.
+  question: You are now in contact with lucknow approach and you have departed Lucknow.
+    Passing 2700 ft, cleared to level FL180, request higher level FL200.
   description: 
   scenarioType: 0
   answer: 

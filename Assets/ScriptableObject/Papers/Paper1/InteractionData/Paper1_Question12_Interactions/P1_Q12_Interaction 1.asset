@@ -15,8 +15,8 @@ MonoBehaviour:
   atcQuestion: 
   atcAudio: {fileID: 0}
   expectedAnswer: Varanasi Control, AKASA AIR One Four Two, relaying for Victor Golf
-    Charlie, Cessna One Seven Two. His position Five Zero nautical miles west of
-    Gaya, maintaining Three Thousand feet on QNH Nine Nine Eight, VMC, estimating
-    Gaya Zero Four Three One.
+    Charlie, Cessna One Seven Two. Position Five Zero nautical miles west of Gaya,
+    maintaining Three Thousand feet on QNH Niner Niner Eight, VMC, estimating Gaya
+    Zero Four Three One.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

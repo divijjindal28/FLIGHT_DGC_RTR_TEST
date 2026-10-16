@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: AKASA AIR One Four Two. Taxiway Delta blocked by unserviceable
-    ambulance. Holding short of Delta, request taxi via Echo to holding point Two
-    Seven.
+  expectedAnswer: Lucknow Ground, AKASA AIR One Four Two. Unserviceable ambulance
+    on Taxiway Delta. Holding short of Delta, request new taxi instructions to holding
+    point runway Two Seven.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

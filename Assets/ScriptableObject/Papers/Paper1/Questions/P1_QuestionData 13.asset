@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
   m_Name: P1_QuestionData 13
   m_EditorClassIdentifier: Assembly-CSharp::QuestionData
-  question: You are approaching Gaya. Aircraft port engine shut down due fire.
+  question: You are approaching Gaya, position 45 DME on radial 110 from BBN. Aircrafts
+    port engine shutdown due fire warning, request descend to FL200.
   description: 
   scenarioType: 0
   answer: 

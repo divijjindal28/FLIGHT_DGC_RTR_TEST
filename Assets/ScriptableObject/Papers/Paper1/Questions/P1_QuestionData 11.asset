@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
   m_Name: P1_QuestionData 11
   m_EditorClassIdentifier: Assembly-CSharp::QuestionData
-  question: Report crossing Bravo Bravo November VOR on R 460.
+  question: You are in contact with Varanasi Control, report crossing BBN 0356Z,
+    you are on FL310 estimating GGC 0410 TEPAL next.
   description: 
   scenarioType: 0
   answer: 

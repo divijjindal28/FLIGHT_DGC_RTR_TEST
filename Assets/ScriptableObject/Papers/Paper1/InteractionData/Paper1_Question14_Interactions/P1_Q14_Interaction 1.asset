@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: Varanasi Control AKASA AIR One Four Two, fire alarm has gone off.
-    All parameters normal. Will continue as per flight plan. Revised estimates Golg
-    Golf Charlie VOR Zero Four Three Two, TEPAL. Passing Flight Level Two Six Zero
-    for Flight Level Three Four Seven, ETA Kolkata Zero Five One Two. Passing Flight
-    Level Three One Zero.
+  expectedAnswer: 'Varanasi Control AKASA AIR One Four Two, cancel distress,  fire
+    alarm has gone off. All parameters normal. Will continue as per flight plan.
+    Revised estimates Golf Golf Charlie Zero Four Three Two, TEPAL four seven. At
+    Flight Level Two hundered request climb to Flight Level three one zero. ETA Charlie
+    Charlie Uniform Zero Five One Two. '
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

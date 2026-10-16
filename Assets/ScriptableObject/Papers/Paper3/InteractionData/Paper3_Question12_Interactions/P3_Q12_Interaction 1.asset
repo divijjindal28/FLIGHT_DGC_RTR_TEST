@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
+  m_Name: P3_Q12_Interaction 1
+  m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
+  atcQuestion: 
+  atcAudio: {fileID: 0}
+  expectedAnswer: Delhi Arrival Air India Three Two One, Flight Level One Hundred,
+    BAVOX Six Charlie arrival, medical emergency on board, request priority vectors
+    for landing and medical assistance on arrival. Squawking Seven One Five Four.
+  atcWrongAnswerResponse: Air India Three Two One, Please say your request again.
+  atcWrongAnswerAudio: {fileID: 8300000, guid: 6d86a2b3753998742bd687c76bfb2630, type: 3}

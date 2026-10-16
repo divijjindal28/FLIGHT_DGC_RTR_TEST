@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
   m_Name: P1_Q6_Interaction 2
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
-  atcQuestion: AKASA AIR One Four Two. Cleared to Kolkata via Romeo Four Six Zero,
-    ASARI One Bravo Departure, Flight Level Three One Zero, Squawk Six Two One Five.
-    Start up approved, Runway 27.
+  atcQuestion: AKASA AIR One Four Two. QNH correct, Cleared to Kolkata via Romeo
+    Four Six Zero, ASARI One Bravo Departure, Flight Level Three One Zero, Squawk
+    Six Two One Five. Start up approved, Runway two seven.
   atcAudio: {fileID: 8300000, guid: 75ad01fa22aa6e642b23334cc30e46cc, type: 3}
   expectedAnswer: Cleared to Kolkata via Romeo Four Six Zero, ASARI One Bravo Departure,
     Flight Level Three One Zero, Squawk Six Two One Five, Start up approved, Runway
-    27. AKASA AIR One Four Two.
+    two seven. AKASA AIR One Four Two.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

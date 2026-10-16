@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: Varanasi Control, AKASA AIR One Four Two. Position Bravo Bravo
-    November VOR, time Zero Three Five Six, Flight Level Three One Zero. Estimating
-    Golg Golf Charlie VOR Zero Four One Zero, TEPAL next.
+  expectedAnswer: Varanasi Control, AKASA AIR One Four Two, on one two six decimal
+    two Position Bravo Bravo November,  Zero Three Five Six, Romeo Four Six Zero,
+    Flight Level Three One Zero. Estimating Golf Golf Charlie Zero Four One Zero,
+    TEPAL next.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

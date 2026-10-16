@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
   m_Name: P1_Q9_Interaction 3
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
-  atcQuestion: AKASA AIR One Four Two backtrack approved, line up Runway Two Seven.
+  atcQuestion: AKASA AIR One Four Two backtrack and lineup runway two seven.
   atcAudio: {fileID: 8300000, guid: 258b0985d0f5ab746adb2178b894bc0c, type: 3}
-  expectedAnswer: Backtrack approved, line up Runway Two Seven. AKASA AIR One Four
-    Two. AKASA AIR One Four Two ready for departure Runway Two Seven.
+  expectedAnswer: 'Backtrack and lineup runway two seven, AKASA AIR one four two.
+    AKASA Air one four two, ready for departure runway two seven. '
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

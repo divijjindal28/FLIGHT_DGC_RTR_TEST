@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d3143c31f0e3544082110d269190776, type: 3}
+  m_Name: P3_Q9_Interaction 2
+  m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
+  atcQuestion: Air India Three Two One, Delhi Radar, roger. Climb to Flight Level
+    Three Four Zero. Report reaching.
+  atcAudio: {fileID: 8300000, guid: 61eb04b5bd96791418fe9b0da37164de, type: 3}
+  expectedAnswer: Climb to Flight Level Three Four Zero, will report reaching, Air
+    India Three Two One.
+  atcWrongAnswerResponse: Air India Three Two One, Please say your request again.
+  atcWrongAnswerAudio: {fileID: 8300000, guid: 6d86a2b3753998742bd687c76bfb2630, type: 3}

@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5236bc940ee9544aaa6ca61df7b2548, type: 3}
   m_Name: P1_QuestionData 14
   m_EditorClassIdentifier: Assembly-CSharp::QuestionData
-  question: Fire alarm goes off. You decide to continue as per flight plan.
+  question: Fire alarm goes off. You decide to continue as per flight plan. Estimate
+    GGC 0432 TEPAL 47 ETA CCU 0512.
   description: 
   scenarioType: 0
   answer: 

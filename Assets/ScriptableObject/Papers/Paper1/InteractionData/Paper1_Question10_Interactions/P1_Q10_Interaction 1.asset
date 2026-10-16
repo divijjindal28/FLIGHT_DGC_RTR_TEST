@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: Lucknow Approach AKASA AIR One Four Two passing Two Thousand Seven
-    Hundred feet, climbing to Flight Level One Eight Zero. Request Flight Level Two
-    Hundred.
+  expectedAnswer: Lucknow Approach AKASA AIR One Four Two,on one two one decimal
+    seven, passing Two Thousand Seven Hundred feet, cleared to Flight Level One Eight
+    Zero. Request further climb to Flight Level Two Hundred.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

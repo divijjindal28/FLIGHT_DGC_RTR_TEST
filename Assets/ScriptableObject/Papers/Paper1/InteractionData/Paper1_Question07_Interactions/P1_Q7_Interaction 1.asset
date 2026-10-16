@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: AKASA AIR One Four Two, persons on board One Six Nine, security
-    check completed, request taxi.
+  expectedAnswer: Lucknow Ground, Akasa Air one four two, stand one zero five left,
+    request Taxi Instructions, Information Bravo.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}

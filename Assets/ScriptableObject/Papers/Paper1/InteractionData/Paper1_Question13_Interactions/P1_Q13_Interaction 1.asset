@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTRInteractionData
   atcQuestion: 
   atcAudio: {fileID: 0}
-  expectedAnswer: MAYDAY, MAYDAY, MAYDAY, Varanasi Control, AKASA AIR One Four Two.
-    Port engine shut down due fire warning. Position Four Five DME on radial One
-    One Zero from Bravo Bravo November VOR. Request descend to Flight Level Two Hundred.
-    Intend emergency landing at Varanasi. Persons on board One Six Nine. Endurance
-    Three hours.
+  expectedAnswer: MAYDAY, MAYDAY, MAYDAY, Varanasi Control, AKASA AIR One Four Two,
+    Boeing 737. Port engine shut down due fire warning. Position Four Five DME on
+    radial One One Zero from Bravo Bravo November. Request descend to Flight Level
+    Two Hundred. Will carry out  emergency landing at Varanasi. Persons on board
+    One Six Niner. Endurance Two hours.
   atcWrongAnswerResponse: AKASA AIR One Four Two, Please say your request again.
   atcWrongAnswerAudio: {fileID: 8300000, guid: 39daed02d9e9d914da955023a470d376, type: 3}
